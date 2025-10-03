@@ -19,6 +19,11 @@ public interface IUnitOfWork : IDisposable
     INotificationRepository NotificationRepository { get; }
     IChatMessageRepository ChatMessageRepository { get; }
     IStoreLocationRepository StoreLocationRepository { get; }
+    IBrandRepository BrandRepository { get; }
+    IVoucherRepository VoucherRepository { get; }
+    IProductVoucherRepository ProductVoucherRepository { get; }
+    IUserVoucherRepository UserVoucherRepository { get; }
+    IWishlistRepository WishlistRepository { get; }
 
     Task<int> SaveChangesAsync();
 }

@@ -16,6 +16,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[Brands]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[CartItems]",
          "ObjectType": 0
       },
@@ -48,11 +52,27 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[ProductVouchers]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[StoreLocations]",
          "ObjectType": 0
       },
       {
          "Name": "[dbo].[Users]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserVouchers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Vouchers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Wishlists]",
          "ObjectType": 0
       }
    ],

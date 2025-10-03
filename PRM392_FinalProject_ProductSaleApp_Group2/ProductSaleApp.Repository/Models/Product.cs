@@ -23,7 +23,15 @@ public partial class Product
 
     public int? CategoryId { get; set; }
 
+    public int? BrandId { get; set; }
+
+    public virtual Brand Brand { get; set; }
+
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual Category Category { get; set; }
+
+    public virtual ICollection<ProductVoucher> ProductVouchers { get; set; } = new List<ProductVoucher>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

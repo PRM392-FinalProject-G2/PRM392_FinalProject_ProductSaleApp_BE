@@ -23,6 +23,11 @@ public class UnitOfWork : IUnitOfWork
     private INotificationRepository _notificationRepository;
     private IChatMessageRepository _chatMessageRepository;
     private IStoreLocationRepository _storeLocationRepository;
+    private IBrandRepository _brandRepository;
+    private IVoucherRepository _voucherRepository;
+    private IProductVoucherRepository _productVoucherRepository;
+    private IUserVoucherRepository _userVoucherRepository;
+    private IWishlistRepository _wishlistRepository;
 
     public UnitOfWork(SalesAppDBContext dbContext)
     {
@@ -52,6 +57,11 @@ public class UnitOfWork : IUnitOfWork
     public INotificationRepository NotificationRepository => _notificationRepository ??= new NotificationRepository(_dbContext);
     public IChatMessageRepository ChatMessageRepository => _chatMessageRepository ??= new ChatMessageRepository(_dbContext);
     public IStoreLocationRepository StoreLocationRepository => _storeLocationRepository ??= new StoreLocationRepository(_dbContext);
+    public IBrandRepository BrandRepository => _brandRepository ??= new BrandRepository(_dbContext);
+    public IVoucherRepository VoucherRepository => _voucherRepository ??= new VoucherRepository(_dbContext);
+    public IProductVoucherRepository ProductVoucherRepository => _productVoucherRepository ??= new ProductVoucherRepository(_dbContext);
+    public IUserVoucherRepository UserVoucherRepository => _userVoucherRepository ??= new UserVoucherRepository(_dbContext);
+    public IWishlistRepository WishlistRepository => _wishlistRepository ??= new WishlistRepository(_dbContext);
 
     public Task<int> SaveChangesAsync()
     {

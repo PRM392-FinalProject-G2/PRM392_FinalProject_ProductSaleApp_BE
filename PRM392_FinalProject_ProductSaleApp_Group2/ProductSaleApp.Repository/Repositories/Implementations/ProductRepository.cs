@@ -21,6 +21,7 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
     {
         return _dbContext.Products
             .Include(p => p.Category)
+            .Include(p => p.Brand)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.ProductId == id);
     }
@@ -29,6 +30,7 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
     {
         var query = _dbContext.Products
             .Include(p => p.Category)
+            .Include(p => p.Brand)
             .AsNoTracking()
             .OrderByDescending(p => p.ProductId);
 
