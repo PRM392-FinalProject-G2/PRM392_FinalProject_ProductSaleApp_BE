@@ -21,6 +21,9 @@ public class CartItemRepository : EntityRepository<CartItem>, ICartItemRepositor
     {
         return _dbContext.CartItems
             .Include(ci => ci.Product)
+                .ThenInclude(p => p.Category)
+            .Include(c => c.Product)
+                .ThenInclude(p => p.Brand)
             .AsNoTracking()
             .FirstOrDefaultAsync(ci => ci.CartItemId == id);
     }
@@ -29,6 +32,9 @@ public class CartItemRepository : EntityRepository<CartItem>, ICartItemRepositor
     {
         var query = _dbContext.CartItems
             .Include(ci => ci.Product)
+                .ThenInclude(p => p.Category)
+            .Include(c => c.Product)
+                .ThenInclude(p => p.Brand)
             .AsNoTracking()
             .OrderByDescending(ci => ci.CartItemId);
 

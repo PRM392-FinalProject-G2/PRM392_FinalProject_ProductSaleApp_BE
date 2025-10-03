@@ -10,6 +10,7 @@ public class ServiceMappingProfile : Profile
     {
         CreateMap<Category, CategoryBM>().ReverseMap();
         CreateMap<Product, ProductBM>().ReverseMap();
+        CreateMap<Brand, BrandBM>().ReverseMap();
         CreateMap<Cart, CartBM>().ReverseMap();
         CreateMap<CartItem, CartItemBM>().ReverseMap();
         CreateMap<Order, OrderBM>().ReverseMap();
@@ -18,6 +19,10 @@ public class ServiceMappingProfile : Profile
         CreateMap<Notification, NotificationBM>().ReverseMap();
         CreateMap<ChatMessage, ChatMessageBM>().ReverseMap();
         CreateMap<StoreLocation, StoreLocationBM>().ReverseMap();
+        CreateMap<Voucher, VoucherBM>().ReverseMap();
+        CreateMap<ProductVoucher, ProductVoucherBM>().ReverseMap();
+        CreateMap<UserVoucher, UserVoucherBM>().ReverseMap();
+        CreateMap<Wishlist, WishlistBM>().ReverseMap();
     }
 }
 

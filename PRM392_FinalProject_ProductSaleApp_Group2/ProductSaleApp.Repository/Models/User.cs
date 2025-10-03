@@ -21,11 +21,19 @@ public partial class User
 
     public string Role { get; set; }
 
+    public string AvatarUrl { get; set; }
+
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
-    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+    public virtual ICollection<ChatMessage> ChatMessageReceivers { get; set; } = new List<ChatMessage>();
+
+    public virtual ICollection<ChatMessage> ChatMessageSenders { get; set; } = new List<ChatMessage>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

@@ -22,6 +22,9 @@ public class OrderRepository : EntityRepository<Order>, IOrderRepository
         return _dbContext.Orders
             .Include(o => o.User)
             .Include(o => o.Cart)
+                .ThenInclude(c => c.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Category)
             .Include(o => o.Payments)
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.OrderId == id);

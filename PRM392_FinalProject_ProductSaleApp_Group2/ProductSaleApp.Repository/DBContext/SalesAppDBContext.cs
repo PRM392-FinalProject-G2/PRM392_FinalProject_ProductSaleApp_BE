@@ -14,6 +14,8 @@ public partial class SalesAppDBContext : DbContext
     {
     }
 
+    public virtual DbSet<Brand> Brands { get; set; }
+
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<CartItem> CartItems { get; set; }
@@ -30,15 +32,35 @@ public partial class SalesAppDBContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductVoucher> ProductVouchers { get; set; }
+
     public virtual DbSet<StoreLocation> StoreLocations { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserVoucher> UserVouchers { get; set; }
+
+    public virtual DbSet<Voucher> Vouchers { get; set; }
+
+    public virtual DbSet<Wishlist> Wishlists { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Brand>(entity =>
+        {
+            entity.HasKey(e => e.BrandId).HasName("PK__Brands__DAD4F3BE056CC7E8");
+
+            entity.Property(e => e.BrandId).HasColumnName("BrandID");
+            entity.Property(e => e.BrandName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.LogoUrl).HasMaxLength(255);
+        });
+
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD797759F59A3");
+            entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD7979AD04309");
 
             entity.Property(e => e.CartId).HasColumnName("CartID");
             entity.Property(e => e.Status)
@@ -49,12 +71,12 @@ public partial class SalesAppDBContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Carts__UserID__3E52440B");
+                .HasConstraintName("FK__Carts__UserID__412EB0B6");
         });
 
         modelBuilder.Entity<CartItem>(entity =>
         {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B2A6CF2158A");
+            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B2A51A718FB");
 
             entity.Property(e => e.CartItemId).HasColumnName("CartItemID");
             entity.Property(e => e.CartId).HasColumnName("CartID");
@@ -63,41 +85,49 @@ public partial class SalesAppDBContext : DbContext
 
             entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.CartId)
-                .HasConstraintName("FK__CartItems__CartI__412EB0B6");
+                .HasConstraintName("FK__CartItems__CartI__440B1D61");
 
             entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__CartItems__Produ__4222D4EF");
+                .HasConstraintName("FK__CartItems__Produ__44FF419A");
         });
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2B26E3DCC0");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2B4059F0E1");
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CategoryName)
                 .IsRequired()
                 .HasMaxLength(100);
+            entity.Property(e => e.ImageUrl).HasMaxLength(255);
         });
 
         modelBuilder.Entity<ChatMessage>(entity =>
         {
-            entity.HasKey(e => e.ChatMessageId).HasName("PK__ChatMess__9AB610553660DEC4");
+            entity.HasKey(e => e.ChatMessageId).HasName("PK__ChatMess__9AB61055D8FED1AC");
 
             entity.Property(e => e.ChatMessageId).HasColumnName("ChatMessageID");
+            entity.Property(e => e.ReceiverId).HasColumnName("ReceiverID");
+            entity.Property(e => e.SenderId).HasColumnName("SenderID");
             entity.Property(e => e.SentAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.User).WithMany(p => p.ChatMessages)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__ChatMessa__UserI__534D60F1");
+            entity.HasOne(d => d.Receiver).WithMany(p => p.ChatMessageReceivers)
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ChatMessa__Recei__571DF1D5");
+
+            entity.HasOne(d => d.Sender).WithMany(p => p.ChatMessageSenders)
+                .HasForeignKey(d => d.SenderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ChatMessa__Sende__5629CD9C");
         });
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E32D10B670F");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E32D6D6CE6F");
 
             entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
             entity.Property(e => e.CreatedAt)
@@ -108,12 +138,12 @@ public partial class SalesAppDBContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Notificat__UserI__4F7CD00D");
+                .HasConstraintName("FK__Notificat__UserI__52593CB8");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF3D55B752");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF79A39CE7");
 
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.BillingAddress)
@@ -133,16 +163,16 @@ public partial class SalesAppDBContext : DbContext
 
             entity.HasOne(d => d.Cart).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CartId)
-                .HasConstraintName("FK__Orders__CartID__45F365D3");
+                .HasConstraintName("FK__Orders__CartID__48CFD27E");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Orders__UserID__46E78A0C");
+                .HasConstraintName("FK__Orders__UserID__49C3F6B7");
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A58E4249E6A");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A582C6BC09C");
 
             entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -156,14 +186,15 @@ public partial class SalesAppDBContext : DbContext
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Payments__OrderI__4AB81AF0");
+                .HasConstraintName("FK__Payments__OrderI__4D94879B");
         });
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6ED99896B47");
+            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6ED311FDB53");
 
             entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.BrandId).HasColumnName("BrandID");
             entity.Property(e => e.BriefDescription).HasMaxLength(255);
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.ImageUrl)
@@ -174,14 +205,39 @@ public partial class SalesAppDBContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
 
+            entity.HasOne(d => d.Brand).WithMany(p => p.Products)
+                .HasForeignKey(d => d.BrandId)
+                .HasConstraintName("FK__Products__BrandI__3E52440B");
+
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Products__Catego__3B75D760");
+                .HasConstraintName("FK__Products__Catego__3D5E1FD2");
+        });
+
+        modelBuilder.Entity<ProductVoucher>(entity =>
+        {
+            entity.HasKey(e => e.ProductVoucherId).HasName("PK__ProductV__9597F821456CD583");
+
+            entity.HasIndex(e => new { e.VoucherId, e.ProductId }, "UQ_ProductVoucher").IsUnique();
+
+            entity.Property(e => e.ProductVoucherId).HasColumnName("ProductVoucherID");
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductVouchers)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductVo__Produ__6EF57B66");
+
+            entity.HasOne(d => d.Voucher).WithMany(p => p.ProductVouchers)
+                .HasForeignKey(d => d.VoucherId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductVo__Vouch__6E01572D");
         });
 
         modelBuilder.Entity<StoreLocation>(entity =>
         {
-            entity.HasKey(e => e.LocationId).HasName("PK__StoreLoc__E7FEA4770F6C65F9");
+            entity.HasKey(e => e.LocationId).HasName("PK__StoreLoc__E7FEA47741F06715");
 
             entity.Property(e => e.LocationId).HasColumnName("LocationID");
             entity.Property(e => e.Address)
@@ -193,10 +249,11 @@ public partial class SalesAppDBContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACC02A7AF9");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC32137A29");
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.AvatarUrl).HasMaxLength(255);
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -210,6 +267,78 @@ public partial class SalesAppDBContext : DbContext
             entity.Property(e => e.Username)
                 .IsRequired()
                 .HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<UserVoucher>(entity =>
+        {
+            entity.HasKey(e => e.UserVoucherId).HasName("PK__UserVouc__8017D4B9972D3C81");
+
+            entity.HasIndex(e => new { e.UserId, e.VoucherId }, "UQ_UserVoucher").IsUnique();
+
+            entity.Property(e => e.UserVoucherId).HasColumnName("UserVoucherID");
+            entity.Property(e => e.AssignedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.OrderId).HasColumnName("OrderID");
+            entity.Property(e => e.UsedAt).HasColumnType("datetime");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.UserVouchers)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK__UserVouch__Order__6A30C649");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserVouchers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserVouch__UserI__68487DD7");
+
+            entity.HasOne(d => d.Voucher).WithMany(p => p.UserVouchers)
+                .HasForeignKey(d => d.VoucherId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserVouch__Vouch__693CA210");
+        });
+
+        modelBuilder.Entity<Voucher>(entity =>
+        {
+            entity.HasKey(e => e.VoucherId).HasName("PK__Vouchers__3AEE79C188C210C0");
+
+            entity.HasIndex(e => e.Code, "UQ__Vouchers__A25C5AA7D43203E1").IsUnique();
+
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+            entity.Property(e => e.Code)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.DiscountPercent).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.EndDate).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Wishlist>(entity =>
+        {
+            entity.HasKey(e => e.WishlistId).HasName("PK__Wishlist__233189CBA123BE07");
+
+            entity.HasIndex(e => new { e.UserId, e.ProductId }, "UQ_Wishlist").IsUnique();
+
+            entity.Property(e => e.WishlistId).HasColumnName("WishlistID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.Wishlists)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Wishlists__Produ__5EBF139D");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Wishlists__UserI__5DCAEF64");
         });
 
         OnModelCreatingPartial(modelBuilder);

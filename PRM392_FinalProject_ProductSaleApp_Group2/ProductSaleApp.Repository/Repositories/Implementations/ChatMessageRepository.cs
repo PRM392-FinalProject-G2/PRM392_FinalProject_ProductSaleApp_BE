@@ -20,7 +20,8 @@ public class ChatMessageRepository : EntityRepository<ChatMessage>, IChatMessage
     public override Task<ChatMessage> GetByIdWithDetailsAsync(int id)
     {
         return _dbContext.ChatMessages
-            .Include(cm => cm.User)
+            .Include(cm => cm.Sender)
+            .Include(cm => cm.Receiver)
             .AsNoTracking()
             .FirstOrDefaultAsync(cm => cm.ChatMessageId == id);
     }
@@ -28,7 +29,8 @@ public class ChatMessageRepository : EntityRepository<ChatMessage>, IChatMessage
     public override async Task<(IReadOnlyList<ChatMessage> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
         var query = _dbContext.ChatMessages
-            .Include(cm => cm.User)
+            .Include(cm => cm.Sender)
+            .Include(cm => cm.Receiver)
             .AsNoTracking()
             .OrderByDescending(cm => cm.SentAt);
 

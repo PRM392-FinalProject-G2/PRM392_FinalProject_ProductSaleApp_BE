@@ -22,6 +22,11 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
         return _dbContext.Carts
             .Include(c => c.User)
             .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Category)
+            .Include(p => p.CartItems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Brand)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.CartId == id);
     }

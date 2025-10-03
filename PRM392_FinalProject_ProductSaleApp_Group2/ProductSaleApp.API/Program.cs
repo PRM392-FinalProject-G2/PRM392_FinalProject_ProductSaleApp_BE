@@ -39,6 +39,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
 builder.Services.AddScoped<IStoreLocationService, StoreLocationService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IProductVoucherService, ProductVoucherService>();
+builder.Services.AddScoped<IUserVoucherService, UserVoucherService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW

@@ -10,6 +10,7 @@ namespace ProductSaleApp.API.Mapping
         public MapperProfile()
         {
             CreateMap<ProductRequest, ProductBM>();
+            CreateMap<BrandRequest, BrandBM>();
             CreateMap<CartRequest, CartBM>();
             CreateMap<CartItemRequest, CartItemBM>();
             CreateMap<OrderRequest, OrderBM>();
@@ -18,8 +19,13 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<NotificationRequest, NotificationBM>();
             CreateMap<ChatMessageRequest, ChatMessageBM>();
             CreateMap<StoreLocationRequest, StoreLocationBM>();
+            CreateMap<VoucherRequest, VoucherBM>();
+            CreateMap<ProductVoucherRequest, ProductVoucherBM>();
+            CreateMap<UserVoucherRequest, UserVoucherBM>();
+            CreateMap<WishlistRequest, WishlistBM>();
 
             CreateMap<ProductBM, ProductResponse>();
+            CreateMap<BrandBM, BrandResponse>();
             CreateMap<CartBM, CartResponse>();
             CreateMap<CartItemBM, CartItemResponse>();
             CreateMap<OrderBM, OrderResponse>();
@@ -29,6 +35,10 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<NotificationBM, NotificationResponse>();
             CreateMap<ChatMessageBM, ChatMessageResponse>();
             CreateMap<StoreLocationBM, StoreLocationResponse>();
+            CreateMap<VoucherBM, VoucherResponse>();
+            CreateMap<ProductVoucherBM, ProductVoucherResponse>();
+            CreateMap<UserVoucherBM, UserVoucherResponse>();
+            CreateMap<WishlistBM, WishlistResponse>();
 
             CreateMap(typeof(PagedResult<>), typeof(PagedResponse<>));
         }
