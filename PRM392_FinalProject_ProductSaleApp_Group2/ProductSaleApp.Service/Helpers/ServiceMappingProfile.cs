@@ -8,6 +8,7 @@ public class ServiceMappingProfile : Profile
 {
     public ServiceMappingProfile()
     {
+            // Auth BMs map to Repository models where needed are handled in service, not here
         CreateMap<Category, CategoryBM>().ReverseMap();
         CreateMap<Product, ProductBM>().ReverseMap();
         CreateMap<Brand, BrandBM>().ReverseMap();

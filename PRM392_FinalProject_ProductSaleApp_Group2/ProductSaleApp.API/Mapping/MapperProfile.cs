@@ -9,6 +9,11 @@ namespace ProductSaleApp.API.Mapping
     {
         public MapperProfile()
         {
+            // Auth
+            CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.LoginRequest, ProductSaleApp.Service.BusinessModel.LoginBM>();
+            CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.RegisterRequest, ProductSaleApp.Service.BusinessModel.RegisterBM>();
+            CreateMap<ProductSaleApp.Service.BusinessModel.AuthBM, ProductSaleApp.API.Models.ResponseModel.Auth.AuthResponse>();
+
             CreateMap<ProductRequest, ProductBM>();
             CreateMap<BrandRequest, BrandBM>();
             CreateMap<CartRequest, CartBM>();
