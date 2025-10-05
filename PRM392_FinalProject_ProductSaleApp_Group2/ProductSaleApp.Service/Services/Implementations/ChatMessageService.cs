@@ -9,13 +9,13 @@ using ProductSaleApp.Service.Services.Interfaces;
 
 namespace ProductSaleApp.Service.Services.Implementations;
 
-public class ChatMessageService : CrudService<ChatMessage, ChatMessageBM>, IChatMessageService
+public class ChatMessageService : CrudService<Chatmessage, ChatMessageBM>, IChatMessageService
 {
     public ChatMessageService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
     }
 
-    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<ChatMessage> GetRepository() => UnitOfWork.ChatMessageRepository;
+    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<Chatmessage> GetRepository() => UnitOfWork.ChatMessageRepository;
 }
 
 

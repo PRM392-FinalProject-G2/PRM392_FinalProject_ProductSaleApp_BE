@@ -21,14 +21,14 @@ public class BrandRepository : EntityRepository<Brand>, IBrandRepository
     {
         return _dbContext.Brands
             .AsNoTracking()
-            .FirstOrDefaultAsync(b => b.BrandId == id);
+            .FirstOrDefaultAsync(b => b.Brandid == id);
     }
 
     public override async Task<(IReadOnlyList<Brand> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
         var query = _dbContext.Brands
             .AsNoTracking()
-            .OrderBy(b => b.BrandName);
+            .OrderBy(b => b.Brandname);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

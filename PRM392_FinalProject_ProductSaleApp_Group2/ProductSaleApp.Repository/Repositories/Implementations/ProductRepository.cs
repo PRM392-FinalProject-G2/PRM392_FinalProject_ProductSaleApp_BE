@@ -23,7 +23,7 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.ProductId == id);
+            .FirstOrDefaultAsync(p => p.Productid == id);
     }
 
     public override async Task<(IReadOnlyList<Product> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
@@ -32,7 +32,7 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .AsNoTracking()
-            .OrderByDescending(p => p.ProductId);
+            .OrderByDescending(p => p.Productid);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

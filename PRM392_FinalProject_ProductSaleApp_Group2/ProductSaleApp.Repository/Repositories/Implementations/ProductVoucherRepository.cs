@@ -8,7 +8,7 @@ using ProductSaleApp.Repository.Repositories.Interfaces;
 
 namespace ProductSaleApp.Repository.Repositories.Implementations;
 
-public class ProductVoucherRepository : EntityRepository<ProductVoucher>, IProductVoucherRepository
+public class ProductVoucherRepository : EntityRepository<Productvoucher>, IProductVoucherRepository
 {
     private readonly SalesAppDBContext _dbContext;
 
@@ -17,22 +17,22 @@ public class ProductVoucherRepository : EntityRepository<ProductVoucher>, IProdu
         _dbContext = dbContext;
     }
 
-    public override Task<ProductVoucher> GetByIdWithDetailsAsync(int id)
+    public override Task<Productvoucher> GetByIdWithDetailsAsync(int id)
     {
-        return _dbContext.ProductVouchers
+        return _dbContext.Productvouchers
             .Include(pv => pv.Product)
             .Include(pv => pv.Voucher)
             .AsNoTracking()
-            .FirstOrDefaultAsync(pv => pv.ProductVoucherId == id);
+            .FirstOrDefaultAsync(pv => pv.Productvoucherid == id);
     }
 
-    public override async Task<(IReadOnlyList<ProductVoucher> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
+    public override async Task<(IReadOnlyList<Productvoucher> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
-        var query = _dbContext.ProductVouchers
+        var query = _dbContext.Productvouchers
             .Include(pv => pv.Product)
             .Include(pv => pv.Voucher)
             .AsNoTracking()
-            .OrderByDescending(pv => pv.ProductVoucherId);
+            .OrderByDescending(pv => pv.Productvoucherid);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

@@ -21,14 +21,14 @@ public class PaymentRepository : EntityRepository<Payment>, IPaymentRepository
     {
         return _dbContext.Payments
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.PaymentId == id);
+            .FirstOrDefaultAsync(p => p.Paymentid == id);
     }
 
     public override async Task<(IReadOnlyList<Payment> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
         var query = _dbContext.Payments
             .AsNoTracking()
-            .OrderByDescending(p => p.PaymentDate);
+            .OrderByDescending(p => p.Paymentdate);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

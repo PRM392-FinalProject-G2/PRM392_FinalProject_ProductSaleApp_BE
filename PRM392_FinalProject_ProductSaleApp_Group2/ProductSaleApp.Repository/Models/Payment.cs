@@ -7,15 +7,15 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Payment
 {
-    public int PaymentId { get; set; }
+    public int Paymentid { get; set; }
 
-    public int? OrderId { get; set; }
+    public int? Orderid { get; set; }
 
     public decimal Amount { get; set; }
 
-    public DateTime PaymentDate { get; set; }
+    public DateTime Paymentdate { get; set; }
 
-    public string PaymentStatus { get; set; }
+    public string Paymentstatus { get; set; }
 
     public virtual Order Order { get; set; }
 }

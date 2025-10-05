@@ -12,16 +12,16 @@ public class ServiceMappingProfile : Profile
         CreateMap<Product, ProductBM>().ReverseMap();
         CreateMap<Brand, BrandBM>().ReverseMap();
         CreateMap<Cart, CartBM>().ReverseMap();
-        CreateMap<CartItem, CartItemBM>().ReverseMap();
+        CreateMap<Cartitem, CartItemBM>().ReverseMap();
         CreateMap<Order, OrderBM>().ReverseMap();
         CreateMap<Payment, PaymentBM>().ReverseMap();
         CreateMap<User, UserBM>().ReverseMap();
         CreateMap<Notification, NotificationBM>().ReverseMap();
-        CreateMap<ChatMessage, ChatMessageBM>().ReverseMap();
-        CreateMap<StoreLocation, StoreLocationBM>().ReverseMap();
+        CreateMap<Chatmessage, ChatMessageBM>().ReverseMap();
+        CreateMap<Storelocation, StoreLocationBM>().ReverseMap();
         CreateMap<Voucher, VoucherBM>().ReverseMap();
-        CreateMap<ProductVoucher, ProductVoucherBM>().ReverseMap();
-        CreateMap<UserVoucher, UserVoucherBM>().ReverseMap();
+        CreateMap<Productvoucher, ProductVoucherBM>().ReverseMap();
+        CreateMap<Uservoucher, UserVoucherBM>().ReverseMap();
         CreateMap<Wishlist, WishlistBM>().ReverseMap();
     }
 }

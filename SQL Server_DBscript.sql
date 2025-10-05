@@ -1,5 +1,6 @@
 USE master;
 GO
+
 ALTER DATABASE SalesAppDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE SalesAppDB;
 GO
@@ -7,13 +8,12 @@ GO
 CREATE DATABASE SalesAppDB;
 GO
 
-
 USE SalesAppDB;
 GO
 
-
-
--- Tạo bảng User
+/* ================================
+   Bảng Users
+================================ */
 CREATE TABLE Users (
     UserID INT PRIMARY KEY IDENTITY(1,1),
     Username NVARCHAR(50) NOT NULL,
@@ -21,18 +21,35 @@ CREATE TABLE Users (
     Email NVARCHAR(100) NOT NULL,
     PhoneNumber NVARCHAR(15),
     Address NVARCHAR(255),
-    Role NVARCHAR(50) NOT NULL
+    Role NVARCHAR(50) NOT NULL,
+    AvatarUrl NVARCHAR(255)
 );
 GO
 
--- Tạo bảng Category
+/* ================================
+   Bảng Categories
+================================ */
 CREATE TABLE Categories (
     CategoryID INT PRIMARY KEY IDENTITY(1,1),
-    CategoryName NVARCHAR(100) NOT NULL
+    CategoryName NVARCHAR(100) NOT NULL,
+    ImageUrl NVARCHAR(255)
 );
 GO
 
--- Tạo bảng Product
+/* ================================
+   Bảng Brands
+================================ */
+CREATE TABLE Brands (
+    BrandID INT PRIMARY KEY IDENTITY(1,1),
+    BrandName NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(255),
+    LogoUrl NVARCHAR(255)
+);
+GO
+
+/* ================================
+   Bảng Products
+================================ */
 CREATE TABLE Products (
     ProductID INT PRIMARY KEY IDENTITY(1,1),
     ProductName NVARCHAR(100) NOT NULL,
@@ -42,11 +59,15 @@ CREATE TABLE Products (
     Price DECIMAL(18, 2) NOT NULL,
     ImageURL NVARCHAR(255),
     CategoryID INT,
-    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+    BrandID INT,
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID),
+    FOREIGN KEY (BrandID) REFERENCES Brands(BrandID)
 );
 GO
 
--- Tạo bảng Cart
+/* ================================
+   Bảng Carts
+================================ */
 CREATE TABLE Carts (
     CartID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT,
@@ -56,7 +77,9 @@ CREATE TABLE Carts (
 );
 GO
 
--- Tạo bảng CartItem
+/* ================================
+   Bảng CartItems
+================================ */
 CREATE TABLE CartItems (
     CartItemID INT PRIMARY KEY IDENTITY(1,1),
     CartID INT,
@@ -68,7 +91,9 @@ CREATE TABLE CartItems (
 );
 GO
 
--- Tạo bảng Order
+/* ================================
+   Bảng Orders
+================================ */
 CREATE TABLE Orders (
     OrderID INT PRIMARY KEY IDENTITY(1,1),
     CartID INT,
@@ -82,7 +107,9 @@ CREATE TABLE Orders (
 );
 GO
 
--- Tạo bảng Payment
+/* ================================
+   Bảng Payments
+================================ */
 CREATE TABLE Payments (
     PaymentID INT PRIMARY KEY IDENTITY(1,1),
     OrderID INT,
@@ -93,7 +120,9 @@ CREATE TABLE Payments (
 );
 GO
 
--- Tạo bảng Notification
+/* ================================
+   Bảng Notifications
+================================ */
 CREATE TABLE Notifications (
     NotificationID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT,
@@ -104,17 +133,23 @@ CREATE TABLE Notifications (
 );
 GO
 
--- Tạo bảng ChatMessage
+/* ================================
+   Bảng ChatMessages
+================================ */
 CREATE TABLE ChatMessages (
     ChatMessageID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT,
+    SenderID INT NOT NULL,
+    ReceiverID INT NOT NULL,
     Message NVARCHAR(MAX),
     SentAt DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+    FOREIGN KEY (SenderID) REFERENCES Users(UserID),
+    FOREIGN KEY (ReceiverID) REFERENCES Users(UserID)
 );
 GO
 
--- Tạo bảng StoreLocation
+/* ================================
+   Bảng StoreLocations
+================================ */
 CREATE TABLE StoreLocations (
     LocationID INT PRIMARY KEY IDENTITY(1,1),
     Latitude DECIMAL(9, 6) NOT NULL,
@@ -123,215 +158,300 @@ CREATE TABLE StoreLocations (
 );
 GO
 
--- Insert StoreLocations (chỉ 1 cửa hàng duy nhất)
+/* ================================
+   Bảng Wishlist
+================================ */
+CREATE TABLE Wishlists (
+    WishlistID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    ProductID INT NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    CONSTRAINT UQ_Wishlist UNIQUE(UserID, ProductID)
+);
+GO
+
+/* ================================
+   Bảng Vouchers
+================================ */
+CREATE TABLE Vouchers (
+    VoucherID INT PRIMARY KEY IDENTITY(1,1),
+    Code NVARCHAR(50) NOT NULL UNIQUE,
+    Description NVARCHAR(255),
+    DiscountPercent DECIMAL(5,2),
+    DiscountAmount DECIMAL(18,2),
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    IsActive BIT NOT NULL DEFAULT 1
+);
+GO
+
+/* ================================
+   Bảng UserVouchers (User được phát voucher)
+================================ */
+CREATE TABLE UserVouchers (
+    UserVoucherID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    VoucherID INT NOT NULL,
+    IsUsed BIT NOT NULL DEFAULT 0,
+    UsedAt DATETIME NULL,
+    OrderID INT NULL, -- voucher đã dùng thì gắn với order
+    AssignedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (VoucherID) REFERENCES Vouchers(VoucherID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    CONSTRAINT UQ_UserVoucher UNIQUE(UserID, VoucherID) -- đảm bảo 1 user chỉ có 1 bản voucher này
+);
+GO
+
+/* ================================
+   Bảng ProductVouchers (voucher áp dụng cho product)
+================================ */
+CREATE TABLE ProductVouchers (
+    ProductVoucherID INT PRIMARY KEY IDENTITY(1,1),
+    VoucherID INT NOT NULL,
+    ProductID INT NOT NULL,
+    FOREIGN KEY (VoucherID) REFERENCES Vouchers(VoucherID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    CONSTRAINT UQ_ProductVoucher UNIQUE(VoucherID, ProductID)
+);
+GO
+
+/* ================================
+   Insert StoreLocations
+================================ */
 INSERT INTO StoreLocations (Latitude, Longitude, Address)
 VALUES (10.762622, 106.660172, N'268 Lý Thường Kiệt, Quận 10, TP.HCM');
 GO
 
--- Insert Users (20 users, gồm cả Admin và Customer)
-INSERT INTO Users (Username, PasswordHash, Email, PhoneNumber, Address, Role)
+/* ================================
+   Insert Users (1 Admin + 5 Customers = 6 users)
+================================ */
+INSERT INTO Users (Username, PasswordHash, Email, PhoneNumber, Address, Role, AvatarUrl)
 VALUES
-(N'admin', 'hash_admin', N'admin@salesapp.com', '0909000001', N'268 Lý Thường Kiệt, Q10, HCM', N'Admin'),
-(N'user01', 'hash_pw1', N'user01@gmail.com', '0909000002', N'12 Lê Lợi, Q1, HCM', N'Customer'),
-(N'user02', 'hash_pw2', N'user02@gmail.com', '0909000003', N'34 Hai Bà Trưng, Q1, HCM', N'Customer'),
-(N'user03', 'hash_pw3', N'user03@gmail.com', '0909000004', N'56 Nguyễn Trãi, Q5, HCM', N'Customer'),
-(N'user04', 'hash_pw4', N'user04@gmail.com', '0909000005', N'78 CMT8, Q3, HCM', N'Customer'),
-(N'user05', 'hash_pw5', N'user05@gmail.com', '0909000006', N'90 Pasteur, Q1, HCM', N'Customer'),
-(N'user06', 'hash_pw6', N'user06@gmail.com', '0909000007', N'22 Nguyễn Huệ, Q1, HCM', N'Customer'),
-(N'user07', 'hash_pw7', N'user07@gmail.com', '0909000008', N'15 Điện Biên Phủ, Q1, HCM', N'Customer'),
-(N'user08', 'hash_pw8', N'user08@gmail.com', '0909000009', N'45 Lý Tự Trọng, Q1, HCM', N'Customer'),
-(N'user09', 'hash_pw9', N'user09@gmail.com', '0909000010', N'67 Võ Văn Tần, Q3, HCM', N'Customer'),
-(N'user10', 'hash_pw10', N'user10@gmail.com', '0909000011', N'89 Lý Chính Thắng, Q3, HCM', N'Customer'),
-(N'user11', 'hash_pw11', N'user11@gmail.com', '0909000012', N'12 Nguyễn Văn Cừ, Q5, HCM', N'Customer'),
-(N'user12', 'hash_pw12', N'user12@gmail.com', '0909000013', N'33 Tôn Đức Thắng, Q1, HCM', N'Customer'),
-(N'user13', 'hash_pw13', N'user13@gmail.com', '0909000014', N'55 Trần Hưng Đạo, Q5, HCM', N'Customer'),
-(N'user14', 'hash_pw14', N'user14@gmail.com', '0909000015', N'77 Nguyễn Thị Minh Khai, Q1, HCM', N'Customer'),
-(N'user15', 'hash_pw15', N'user15@gmail.com', '0909000016', N'99 Võ Thị Sáu, Q3, HCM', N'Customer'),
-(N'user16', 'hash_pw16', N'user16@gmail.com', '0909000017', N'12 Cách Mạng Tháng 8, Q10, HCM', N'Customer'),
-(N'user17', 'hash_pw17', N'user17@gmail.com', '0909000018', N'21 Hồng Bàng, Q5, HCM', N'Customer'),
-(N'user18', 'hash_pw18', N'user18@gmail.com', '0909000019', N'30 Nguyễn Tri Phương, Q10, HCM', N'Customer'),
-(N'user19', 'hash_pw19', N'user19@gmail.com', '0909000020', N'40 Hoàng Văn Thụ, Q.Tân Bình, HCM', N'Customer');
+(N'admin', 'hash_admin', N'admin@salesapp.com', '0909000001', N'268 Lý Thường Kiệt, Q10, HCM', N'Admin', N'https://example.com/avatars/admin.jpg'),
+(N'user01', 'hash_pw1', N'user01@gmail.com', '0909000002', N'12 Lê Lợi, Q1, HCM', N'Customer', N'https://example.com/avatars/user01.jpg'),
+(N'user02', 'hash_pw2', N'user02@gmail.com', '0909000003', N'34 Hai Bà Trưng, Q1, HCM', N'Customer', N'https://example.com/avatars/user02.jpg'),
+(N'user03', 'hash_pw3', N'user03@gmail.com', '0909000004', N'56 Nguyễn Trãi, Q5, HCM', N'Customer', N'https://example.com/avatars/user03.jpg'),
+(N'user04', 'hash_pw4', N'user04@gmail.com', '0909000005', N'78 CMT8, Q3, HCM', N'Customer', N'https://example.com/avatars/user04.jpg'),
+(N'user05', 'hash_pw5', N'user05@gmail.com', '0909000006', N'90 Pasteur, Q1, HCM', N'Customer', N'https://example.com/avatars/user05.jpg');
 GO
 
--- Insert Categories (ít thôi, khoảng 4)
-INSERT INTO Categories (CategoryName)
+/* ================================
+   Insert Categories
+================================ */
+INSERT INTO Categories (CategoryName, ImageUrl)
 VALUES
-(N'Điện thoại'),
-(N'Laptop'),
-(N'Thiết bị gia dụng'),
-(N'Phụ kiện');
+(N'Điện thoại', N'https://example.com/categories/phone.jpg'),
+(N'Laptop', N'https://example.com/categories/laptop.jpg'),
+(N'Thiết bị gia dụng', N'https://example.com/categories/appliance.jpg'),
+(N'Phụ kiện', N'https://example.com/categories/accessory.jpg');
 GO
 
--- Insert Products (20 sản phẩm thực tế, thuộc nhiều category)
-INSERT INTO Products (ProductName, BriefDescription, FullDescription, TechnicalSpecifications, Price, ImageURL, CategoryID)
+/* ================================
+   Insert Brands (6 brands)
+================================ */
+INSERT INTO Brands (BrandName, Description, LogoUrl)
 VALUES
-(N'iPhone 15 Pro', N'Smartphone cao cấp', N'Điện thoại Apple iPhone 15 Pro 256GB', N'Chip A17 Pro, 6GB RAM, 256GB ROM', 28990000, N'https://example.com/iphone15.jpg', 1),
-(N'Samsung Galaxy S23', N'Android flagship', N'Samsung Galaxy S23 Ultra 256GB', N'Snapdragon 8 Gen 2, 12GB RAM, 256GB ROM', 25990000, N'https://example.com/s23.jpg', 1),
-(N'Xiaomi Redmi Note 12', N'Giá rẻ hiệu năng cao', N'Redmi Note 12 128GB', N'Snapdragon 4 Gen 1, 6GB RAM, 128GB ROM', 5990000, N'https://example.com/redmi12.jpg', 1),
-(N'MacBook Air M2', N'Laptop mỏng nhẹ', N'MacBook Air M2 2023', N'Apple M2, 16GB RAM, 512GB SSD', 31990000, N'https://example.com/macbookair.jpg', 2),
-(N'MacBook Pro 14', N'Laptop hiệu năng cao', N'MacBook Pro 14 inch M2 Pro', N'Apple M2 Pro, 32GB RAM, 1TB SSD', 52990000, N'https://example.com/mbp14.jpg', 2),
-(N'Asus ROG Strix G16', N'Laptop gaming', N'ROG Strix G16 RTX 4070', N'Core i9 13980HX, 32GB RAM, 1TB SSD, RTX 4070', 45990000, N'https://example.com/rog.jpg', 2),
-(N'Dell XPS 13', N'Ultrabook cao cấp', N'Dell XPS 13 2023', N'Core i7, 16GB RAM, 512GB SSD', 38990000, N'https://example.com/xps13.jpg', 2),
-(N'LG Tủ lạnh Inverter', N'Tủ lạnh tiết kiệm điện', N'Tủ lạnh LG Inverter 420L', N'Ngăn đá trên, tiết kiệm điện A++', 11990000, N'https://example.com/lgfridge.jpg', 3),
-(N'Panasonic Máy giặt', N'Máy giặt cửa trước', N'Máy giặt Panasonic Inverter 9kg', N'TurboWash, tiết kiệm nước', 8990000, N'https://example.com/panasonicwm.jpg', 3),
-(N'Sharp Lò vi sóng', N'Lò vi sóng gia đình', N'Lò vi sóng Sharp 25L', N'900W, 11 chế độ', 2490000, N'https://example.com/sharpmicrowave.jpg', 3),
-(N'Apple Watch Ultra', N'Đồng hồ thông minh', N'Apple Watch Ultra 49mm', N'Sử dụng chip S8, chống nước 100m', 19990000, N'https://example.com/applewatch.jpg', 4),
-(N'AirPods Pro 2', N'Tai nghe không dây', N'Apple AirPods Pro Gen 2', N'ANC, Adaptive Transparency', 5990000, N'https://example.com/airpodspro2.jpg', 4),
-(N'Samsung Galaxy Buds2', N'Tai nghe không dây', N'Samsung Galaxy Buds2 Pro', N'ANC, Bluetooth 5.3', 4990000, N'https://example.com/buds2.jpg', 4),
-(N'Logitech MX Master 3S', N'Chuột cao cấp', N'Chuột không dây Logitech MX Master 3S', N'Bluetooth/USB, DPI 8000', 2490000, N'https://example.com/mxmaster3s.jpg', 4),
-(N'Razer BlackWidow V3', N'Bàn phím gaming', N'Razer BlackWidow V3 Mechanical Keyboard', N'Switch Green, RGB', 3990000, N'https://example.com/razerbw.jpg', 4),
-(N'Sony WH-1000XM5', N'Tai nghe chống ồn', N'Sony WH-1000XM5 Over-ear', N'ANC, Pin 30h', 8990000, N'https://example.com/sony1000xm5.jpg', 4),
-(N'Oppo Find X6', N'Flagship camera', N'Oppo Find X6 Pro 512GB', N'Snapdragon 8 Gen 2, Camera Hasselblad', 23990000, N'https://example.com/oppo.jpg', 1),
-(N'HP Spectre x360', N'Laptop gập xoay', N'HP Spectre x360 OLED 2023', N'Core i7, 16GB RAM, 1TB SSD', 41990000, N'https://example.com/spectre.jpg', 2),
-(N'Midea Điều hòa', N'Điều hòa 1.5HP', N'Máy lạnh Midea Inverter', N'Turbo Cooling, tiết kiệm điện', 7990000, N'https://example.com/mideaac.jpg', 3),
-(N'JBL Flip 6', N'Loa bluetooth', N'JBL Flip 6 Portable Speaker', N'20W, chống nước IP67', 2990000, N'https://example.com/jblflip6.jpg', 4);
+(N'Apple', N'Thương hiệu công nghệ hàng đầu thế giới', N'https://example.com/brands/apple.png'),
+(N'Samsung', N'Tập đoàn điện tử Hàn Quốc', N'https://example.com/brands/samsung.png'),
+(N'Xiaomi', N'Thương hiệu điện tử Trung Quốc', N'https://example.com/brands/xiaomi.png'),
+(N'Dell', N'Thương hiệu máy tính Mỹ', N'https://example.com/brands/dell.png'),
+(N'LG', N'Tập đoàn điện tử Hàn Quốc', N'https://example.com/brands/lg.png'),
+(N'Sony', N'Tập đoàn giải trí và điện tử Nhật Bản', N'https://example.com/brands/sony.png');
 GO
 
--- Insert Carts (20 giỏ hàng, mỗi user có thể có 1 giỏ)
+/* ================================
+   Insert Products (20 sản phẩm - mỗi brand có sản phẩm từ nhiều category)
+================================ */
+INSERT INTO Products (ProductName, BriefDescription, FullDescription, TechnicalSpecifications, Price, ImageURL, CategoryID, BrandID)
+VALUES
+-- APPLE (Điện thoại + Laptop + Phụ kiện)
+(N'iPhone 15 Pro', N'Smartphone cao cấp', N'Điện thoại Apple iPhone 15 Pro 256GB', N'Chip A17 Pro, 6GB RAM, 256GB ROM', 28990000, N'https://example.com/iphone15.jpg', 1, 1),
+(N'iPhone 14', N'Smartphone phổ thông', N'Điện thoại Apple iPhone 14 128GB', N'Chip A15 Bionic, 6GB RAM, 128GB ROM', 19990000, N'https://example.com/iphone14.jpg', 1, 1),
+(N'MacBook Air M2', N'Laptop mỏng nhẹ', N'MacBook Air M2 2023', N'Apple M2, 16GB RAM, 512GB SSD', 31990000, N'https://example.com/macbookair.jpg', 2, 1),
+(N'MacBook Pro 14', N'Laptop hiệu năng cao', N'MacBook Pro 14 inch M2 Pro', N'Apple M2 Pro, 32GB RAM, 1TB SSD', 52990000, N'https://example.com/mbp14.jpg', 2, 1),
+(N'Apple Watch Ultra', N'Đồng hồ thông minh', N'Apple Watch Ultra 49mm', N'Chip S8, chống nước 100m', 19990000, N'https://example.com/applewatch.jpg', 4, 1),
+(N'AirPods Pro 2', N'Tai nghe không dây', N'Apple AirPods Pro Gen 2', N'ANC, Adaptive Transparency', 5990000, N'https://example.com/airpodspro2.jpg', 4, 1),
+
+-- SAMSUNG (Điện thoại + Thiết bị gia dụng + Phụ kiện)
+(N'Samsung Galaxy S23', N'Android flagship', N'Samsung Galaxy S23 Ultra 256GB', N'Snapdragon 8 Gen 2, 12GB RAM, 256GB ROM', 25990000, N'https://example.com/s23.jpg', 1, 2),
+(N'Samsung Galaxy A54', N'Smartphone tầm trung', N'Samsung Galaxy A54 5G 128GB', N'Exynos 1380, 8GB RAM, 128GB ROM', 9990000, N'https://example.com/a54.jpg', 1, 2),
+(N'Samsung Tủ lạnh Inverter', N'Tủ lạnh tiết kiệm điện', N'Tủ lạnh Samsung Inverter 450L', N'Ngăn đá trên, công nghệ Digital Inverter', 13990000, N'https://example.com/samsungfridge.jpg', 3, 2),
+(N'Samsung Máy giặt AI', N'Máy giặt thông minh', N'Máy giặt Samsung AI Inverter 10kg', N'AI Control, Eco Bubble', 10990000, N'https://example.com/samsungwm.jpg', 3, 2),
+(N'Samsung Galaxy Buds2 Pro', N'Tai nghe không dây', N'Samsung Galaxy Buds2 Pro', N'ANC, Bluetooth 5.3', 4990000, N'https://example.com/buds2.jpg', 4, 2),
+
+-- XIAOMI (Điện thoại + Thiết bị gia dụng + Phụ kiện)
+(N'Xiaomi 13 Pro', N'Flagship camera', N'Xiaomi 13 Pro 256GB', N'Snapdragon 8 Gen 2, Camera Leica', 18990000, N'https://example.com/mi13pro.jpg', 1, 3),
+(N'Xiaomi Redmi Note 12', N'Giá rẻ hiệu năng cao', N'Redmi Note 12 128GB', N'Snapdragon 4 Gen 1, 6GB RAM, 128GB ROM', 5990000, N'https://example.com/redmi12.jpg', 1, 3),
+(N'Xiaomi Robot Vacuum', N'Robot hút bụi', N'Xiaomi Robot Vacuum S10+', N'LDS Navigation, 4000Pa', 7990000, N'https://example.com/mivacuum.jpg', 3, 3),
+(N'Xiaomi Buds 4 Pro', N'Tai nghe cao cấp', N'Xiaomi Buds 4 Pro', N'ANC, LHDC 5.0', 2990000, N'https://example.com/mibuds4.jpg', 4, 3),
+
+-- DELL (Laptop + Phụ kiện)
+(N'Dell XPS 13', N'Ultrabook cao cấp', N'Dell XPS 13 2023', N'Core i7, 16GB RAM, 512GB SSD', 38990000, N'https://example.com/xps13.jpg', 2, 4),
+(N'Dell Inspiron 15', N'Laptop văn phòng', N'Dell Inspiron 15 3520', N'Core i5, 8GB RAM, 512GB SSD', 15990000, N'https://example.com/inspiron15.jpg', 2, 4),
+
+-- LG (Thiết bị gia dụng + Phụ kiện)
+(N'LG Tủ lạnh Inverter', N'Tủ lạnh tiết kiệm điện', N'Tủ lạnh LG Inverter 420L', N'Ngăn đá trên, tiết kiệm điện A++', 11990000, N'https://example.com/lgfridge.jpg', 3, 5),
+(N'LG Máy lạnh Dual Inverter', N'Điều hòa cao cấp', N'Máy lạnh LG Dual Inverter 1.5HP', N'Turbo Cooling, tiết kiệm điện', 8990000, N'https://example.com/lgac.jpg', 3, 5),
+
+-- SONY (Phụ kiện)
+(N'Sony WH-1000XM5', N'Tai nghe chống ồn', N'Sony WH-1000XM5 Over-ear', N'ANC, Pin 30h', 8990000, N'https://example.com/sony1000xm5.jpg', 4, 6);
+GO
+
+/* ================================
+   Insert Carts (6 giỏ hàng cho 5 customers - 1 user có 2 giỏ)
+================================ */
 INSERT INTO Carts (UserID, TotalPrice, Status)
 VALUES
-(2, 28990000, N'Active'),
-(3, 25990000, N'Completed'),
-(4, 9190000, N'Completed'),
-(5, 52990000, N'Completed'),
-(6, 3990000, N'Active'),
-(7, 11990000, N'Completed'),
-(8, 8990000, N'Completed'),
-(9, 2490000, N'Completed'),
-(10, 41990000, N'Active'),
-(11, 23990000, N'Completed'),
-(12, 2990000, N'Active'),
-(13, 45990000, N'Completed'),
-(14, 7990000, N'Completed'),
-(15, 5990000, N'Completed'),
-(16, 28990000, N'Active'),
-(17, 38990000, N'Completed'),
-(18, 45990000, N'Completed'),
-(19, 4990000, N'Active'),
-(20, 8990000, N'Completed'),
-(2, 2490000, N'Completed');
+(2, 28990000, N'Active'),      -- user01 giỏ đang active
+(3, 25990000, N'Completed'),   -- user02 đã hoàn thành
+(4, 52990000, N'Completed'),   -- user03 đã hoàn thành
+(5, 11990000, N'Completed'),   -- user04 đã hoàn thành
+(6, 8990000, N'Active'),       -- user05 đang active
+(2, 19990000, N'Completed');   -- user01 giỏ thứ 2 đã hoàn thành
 GO
 
--- Insert CartItems (mỗi giỏ có nhiều item)
+/* ================================
+   Insert CartItems
+================================ */
 INSERT INTO CartItems (CartID, ProductID, Quantity, Price)
 VALUES
-(1, 1, 1, 28990000),
-(2, 2, 1, 25990000),
-(3, 3, 1, 5990000),
-(3, 12, 1, 5990000),
-(4, 5, 1, 52990000),
-(5, 15, 1, 3990000),
-(6, 8, 1, 11990000),
-(7, 9, 1, 8990000),
-(8, 10, 1, 2490000),
-(9, 18, 1, 41990000),
-(10, 17, 1, 23990000),
-(11, 20, 1, 2990000),
-(12, 6, 1, 45990000),
-(13, 19, 1, 7990000),
-(14, 12, 1, 5990000),
-(15, 1, 1, 28990000),
-(16, 4, 1, 31990000),
-(17, 6, 1, 45990000),
-(18, 13, 1, 4990000),
-(19, 16, 1, 8990000);
+(1, 1, 1, 28990000),  -- user01 cart active: iPhone 15 Pro
+(2, 7, 1, 25990000),  -- user02 cart completed: Samsung S23
+(3, 4, 1, 52990000),  -- user03 cart completed: MacBook Pro 14
+(4, 18, 1, 11990000), -- user04 cart completed: LG Tủ lạnh
+(5, 20, 1, 8990000),  -- user05 cart active: Sony WH-1000XM5
+(6, 2, 1, 19990000);  -- user01 cart 2 completed: iPhone 14
 GO
 
--- Insert Orders (20 order, liên kết carts)
-INSERT INTO Orders (CartID, UserID, PaymentMethod, BillingAddress, OrderStatus)
+/* ================================
+   Insert Orders (5 orders từ 5 carts đã completed)
+================================ */
+INSERT INTO Orders (CartID, UserID, PaymentMethod, BillingAddress, OrderStatus, OrderDate)
 VALUES
-(2, 3, N'Credit Card', N'34 Hai Bà Trưng, Q1, HCM', N'Success'),
-(3, 4, N'COD', N'56 Nguyễn Trãi, Q5, HCM', N'Success'),
-(4, 5, N'Credit Card', N'90 Pasteur, Q1, HCM', N'Success'),
-(6, 7, N'Bank Transfer', N'15 Điện Biên Phủ, Q1, HCM', N'Success'),
-(7, 8, N'COD', N'45 Lý Tự Trọng, Q1, HCM', N'Success'),
-(8, 9, N'Momo', N'67 Võ Văn Tần, Q3, HCM', N'Success'),
-(9, 10, N'Credit Card', N'89 Lý Chính Thắng, Q3, HCM', N'Pending'),
-(10, 11, N'Bank Transfer', N'12 Nguyễn Văn Cừ, Q5, HCM', N'Success'),
-(11, 12, N'COD', N'33 Tôn Đức Thắng, Q1, HCM', N'Success'),
-(12, 13, N'COD', N'55 Trần Hưng Đạo, Q5, HCM', N'Success'),
-(13, 14, N'Momo', N'77 Nguyễn Thị Minh Khai, Q1, HCM', N'Success'),
-(14, 15, N'COD', N'99 Võ Thị Sáu, Q3, HCM', N'Success'),
-(15, 16, N'Credit Card', N'12 CMT8, Q10, HCM', N'Pending'),
-(16, 17, N'Momo', N'21 Hồng Bàng, Q5, HCM', N'Success'),
-(17, 18, N'Bank Transfer', N'30 Nguyễn Tri Phương, Q10, HCM', N'Success'),
-(18, 19, N'COD', N'40 Hoàng Văn Thụ, Q.Tân Bình, HCM', N'Success'),
-(19, 20, N'COD', N'268 Lý Thường Kiệt, Q10, HCM', N'Success'),
-(3, 2, N'Momo', N'12 Lê Lợi, Q1, HCM', N'Success'),
-(4, 6, N'COD', N'22 Nguyễn Huệ, Q1, HCM', N'Success'),
-(10, 8, N'Bank Transfer', N'15 Điện Biên Phủ, Q1, HCM', N'Pending');
+(2, 3, N'Credit Card', N'34 Hai Bà Trưng, Q1, HCM', N'Success', '2025-09-15 10:30:00'),
+(3, 4, N'COD', N'56 Nguyễn Trãi, Q5, HCM', N'Success', '2025-09-16 14:20:00'),
+(4, 5, N'Bank Transfer', N'78 CMT8, Q3, HCM', N'Success', '2025-09-17 09:15:00'),
+(6, 2, N'Momo', N'12 Lê Lợi, Q1, HCM', N'Success', '2025-09-18 11:45:00'),
+(2, 3, N'COD', N'34 Hai Bà Trưng, Q1, HCM', N'Pending', '2025-09-19 16:30:00');
 GO
 
--- Insert Payments (20 payment, mapping order)
-INSERT INTO Payments (OrderID, Amount, PaymentStatus)
+/* ================================
+   Insert Payments (5 payments tương ứng 5 orders)
+================================ */
+INSERT INTO Payments (OrderID, Amount, PaymentStatus, PaymentDate)
 VALUES
-(1, 25990000, N'Paid'),
-(2, 9190000, N'Paid'),
-(3, 52990000, N'Paid'),
-(4, 3990000, N'Paid'),
-(5, 11990000, N'Paid'),
-(6, 8990000, N'Paid'),
-(7, 41990000, N'Pending'),
-(8, 23990000, N'Paid'),
-(9, 2990000, N'Paid'),
-(10, 45990000, N'Paid'),
-(11, 7990000, N'Paid'),
-(12, 5990000, N'Paid'),
-(13, 28990000, N'Pending'),
-(14, 38990000, N'Paid'),
-(15, 45990000, N'Paid'),
-(16, 4990000, N'Paid'),
-(17, 8990000, N'Paid'),
-(18, 5990000, N'Paid'),
-(19, 11990000, N'Paid'),
-(20, 23990000, N'Pending');
+(1, 25990000, N'Paid', '2025-09-15 10:35:00'),
+(2, 52990000, N'Paid', '2025-09-16 14:25:00'),
+(3, 11990000, N'Paid', '2025-09-17 09:20:00'),
+(4, 19990000, N'Paid', '2025-09-18 11:50:00'),
+(5, 25990000, N'Pending', '2025-09-19 16:35:00');
 GO
 
--- Insert Notifications (20 row)
-INSERT INTO Notifications (UserID, Message, IsRead)
+/* ================================
+   Insert Notifications (10 rows)
+================================ */
+INSERT INTO Notifications (UserID, Message, IsRead, CreatedAt)
 VALUES
-(2, N'Đơn hàng của bạn đã được xác nhận.', 0),
-(3, N'Thanh toán thành công đơn hàng.', 1),
-(4, N'Giỏ hàng của bạn còn sản phẩm chưa thanh toán.', 0),
-(5, N'Đơn hàng #3 đang được giao.', 1),
-(6, N'Bạn đã thêm sản phẩm mới vào giỏ.', 0),
-(7, N'Thanh toán đơn hàng thành công.', 1),
-(8, N'Đơn hàng #7 đã được giao.', 1),
-(9, N'Đơn hàng #8 đã được hủy.', 0),
-(10, N'Bạn nhận được khuyến mãi 10% cho đơn hàng tiếp theo.', 0),
-(11, N'Đơn hàng #10 đang chờ thanh toán.', 0),
-(12, N'Bạn vừa thêm sản phẩm vào wishlist.', 0),
-(13, N'Đơn hàng #12 đã hoàn tất.', 1),
-(14, N'Voucher 50k cho bạn trong tuần này.', 0),
-(15, N'Đơn hàng #14 thành công.', 1),
-(16, N'Đơn hàng #15 đang xử lý.', 0),
-(17, N'Bạn đã thanh toán đơn hàng #16.', 1),
-(18, N'Đơn hàng #17 thành công.', 1),
-(19, N'Đơn hàng #18 đang giao.', 0),
-(20, N'Chúc mừng bạn nhận voucher 100k.', 0);
+(2, N'Đơn hàng của bạn đã được xác nhận.', 0, '2025-09-15 10:30:00'),
+(3, N'Thanh toán thành công đơn hàng.', 1, '2025-09-16 14:20:00'),
+(4, N'Giỏ hàng của bạn còn sản phẩm chưa thanh toán.', 0, '2025-09-17 09:15:00'),
+(5, N'Đơn hàng #3 đang được giao.', 1, '2025-09-18 11:45:00'),
+(6, N'Bạn đã thêm sản phẩm mới vào giỏ.', 0, '2025-09-19 16:30:00'),
+(2, N'Thanh toán đơn hàng #4 thành công.', 1, '2025-09-20 13:10:00'),
+(3, N'Đơn hàng #5 đang chờ xác nhận.', 0, '2025-09-21 10:00:00'),
+(4, N'Bạn nhận được voucher giảm giá 10%.', 0, '2025-09-22 15:25:00'),
+(5, N'Sản phẩm yêu thích của bạn đang giảm giá.', 0, '2025-09-23 12:40:00'),
+(6, N'Chúc mừng bạn nhận voucher 100k.', 0, '2025-09-24 09:50:00');
 GO
 
--- Insert ChatMessages (20 row)
-INSERT INTO ChatMessages (UserID, Message)
+/* ================================
+   Insert ChatMessages (10 rows)
+================================ */
+INSERT INTO ChatMessages (SenderID, ReceiverID, Message, SentAt)
 VALUES
-(2, N'Tôi muốn hỏi về iPhone 15 Pro còn hàng không?'),
-(3, N'Xin báo giá chi tiết Samsung S23.'),
-(4, N'Có giao hàng về Bình Dương không?'),
-(5, N'Thời gian bảo hành của MacBook Pro là bao lâu?'),
-(6, N'Tôi muốn trả góp Asus ROG Strix được không?'),
-(7, N'LG Tủ lạnh Inverter có màu bạc không?'),
-(8, N'Panasonic Máy giặt có giặt hơi nước không?'),
-(9, N'Lò vi sóng Sharp bảo hành bao lâu?'),
-(10, N'Apple Watch Ultra có chống nước biển không?'),
-(11, N'AirPods Pro 2 kết nối được Android không?'),
-(12, N'Samsung Buds2 có micro không?'),
-(13, N'Logitech MX Master có hỗ trợ Mac không?'),
-(14, N'Bàn phím Razer có layout TKL không?'),
-(15, N'Sony WH-1000XM5 có app điều khiển không?'),
-(16, N'Oppo Find X6 có sạc nhanh bao nhiêu W?'),
-(17, N'HP Spectre có màn hình cảm ứng không?'),
-(18, N'Điều hòa Midea có chế độ ngủ không?'),
-(19, N'JBL Flip 6 có sạc nhanh không?'),
-(20, N'Tôi cần xuất hóa đơn VAT cho đơn hàng.');
+(2, 1, N'Tôi muốn hỏi về iPhone 15 Pro còn hàng không?', '2025-09-15 10:00:00'),
+(1, 2, N'Dạ vẫn còn hàng ạ. Anh/chị cần thêm thông tin gì không?', '2025-09-15 10:05:00'),
+(3, 1, N'Xin báo giá chi tiết Samsung S23.', '2025-09-16 11:30:00'),
+(1, 3, N'Samsung S23 hiện tại giá 25.990.000đ, bảo hành 12 tháng.', '2025-09-16 11:35:00'),
+(4, 1, N'MacBook Pro 14 có giao hàng về Bình Dương không?', '2025-09-17 14:20:00'),
+(1, 4, N'Shop có giao hàng toàn quốc ạ, Bình Dương được giao trong 1-2 ngày.', '2025-09-17 14:25:00'),
+(5, 1, N'Tủ lạnh LG có bảo hành bao lâu?', '2025-09-18 09:15:00'),
+(1, 5, N'Tủ lạnh LG bảo hành 12 tháng chính hãng ạ.', '2025-09-18 09:20:00'),
+(6, 1, N'Sony WH-1000XM5 có app điều khiển không?', '2025-09-19 15:40:00'),
+(1, 6, N'Có ạ, tai nghe có app Sony Headphones Connect để tùy chỉnh âm thanh.', '2025-09-19 15:45:00');
 GO
 
+/* ================================
+   Insert Wishlists (10 rows)
+================================ */
+INSERT INTO Wishlists (UserID, ProductID, CreatedAt)
+VALUES
+(2, 1, '2025-09-10 10:00:00'),  -- user01 thích iPhone 15 Pro
+(2, 3, '2025-09-11 14:30:00'),  -- user01 thích MacBook Air M2
+(3, 7, '2025-09-12 09:15:00'),  -- user02 thích Samsung S23
+(3, 5, '2025-09-12 16:45:00'),  -- user02 thích Apple Watch
+(4, 4, '2025-09-13 11:20:00'),  -- user03 thích MacBook Pro 14
+(4, 16, '2025-09-14 13:50:00'), -- user03 thích Dell XPS 13
+(5, 18, '2025-09-15 10:30:00'), -- user04 thích LG Tủ lạnh
+(5, 9, '2025-09-16 15:10:00'),  -- user04 thích Samsung Tủ lạnh
+(6, 20, '2025-09-17 12:40:00'), -- user05 thích Sony WH-1000XM5
+(6, 6, '2025-09-18 09:55:00');  -- user05 thích AirPods Pro 2
+GO
+
+/* ================================
+   Insert Vouchers (10 vouchers)
+================================ */
+INSERT INTO Vouchers (Code, Description, DiscountPercent, DiscountAmount, StartDate, EndDate, IsActive)
+VALUES
+(N'SALE10', N'Giảm 10% cho tất cả sản phẩm', 10.00, NULL, '2025-01-01', '2025-12-31', 1),
+(N'WELCOME50K', N'Giảm 50k cho khách hàng mới', NULL, 50000, '2025-01-01', '2025-12-31', 1),
+(N'FLASH100K', N'Flash sale giảm 100k', NULL, 100000, '2025-10-01', '2025-10-15', 1),
+(N'LAPTOP15', N'Giảm 15% cho laptop', 15.00, NULL, '2025-01-01', '2025-06-30', 1),
+(N'PHONE20', N'Giảm 20% cho điện thoại', 20.00, NULL, '2025-03-01', '2025-03-31', 0),
+(N'NEWYEAR200K', N'Tết giảm 200k', NULL, 200000, '2025-01-20', '2025-02-10', 1),
+(N'SUMMER25', N'Hè giảm 25%', 25.00, NULL, '2025-06-01', '2025-08-31', 1),
+(N'BLACKFRIDAY30', N'Black Friday giảm 30%', 30.00, NULL, '2025-11-25', '2025-11-30', 1),
+(N'FREESHIP', N'Miễn phí vận chuyển', NULL, 30000, '2025-01-01', '2025-12-31', 1),
+(N'VIP500K', N'Giảm 500k cho VIP', NULL, 500000, '2025-01-01', '2025-12-31', 1);
+GO
+
+/* ================================
+   Insert ProductVouchers (liên kết voucher với sản phẩm)
+================================ */
+INSERT INTO ProductVouchers (VoucherID, ProductID)
+VALUES
+-- SALE10 áp dụng cho tất cả sản phẩm
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
+(1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20),
+-- LAPTOP15 chỉ cho laptop
+(4, 3), (4, 4), (4, 16), (4, 17),
+-- PHONE20 chỉ cho điện thoại
+(5, 1), (5, 2), (5, 7), (5, 8), (5, 12), (5, 13),
+-- FLASH100K cho một số sản phẩm hot
+(3, 1), (3, 4), (3, 5), (3, 6),
+-- SUMMER25 cho phụ kiện
+(7, 5), (7, 6), (7, 11), (7, 15), (7, 20),
+-- VIP500K cho sản phẩm cao cấp
+(10, 1), (10, 4), (10, 7), (10, 16);
+GO
+
+/* ================================
+   Insert UserVouchers (phát voucher cho 5 customers)
+================================ */
+INSERT INTO UserVouchers (UserID, VoucherID, IsUsed, UsedAt, OrderID, AssignedAt)
+VALUES
+-- User đã sử dụng voucher
+(3, 1, 1, '2025-09-15 10:30:00', 1, '2025-09-10 09:00:00'), -- user02 dùng SALE10 cho order 1
+(4, 2, 1, '2025-09-16 14:20:00', 2, '2025-09-11 10:00:00'), -- user03 dùng WELCOME50K cho order 2
+(5, 4, 1, '2025-09-17 09:15:00', 3, '2025-09-12 11:00:00'), -- user04 dùng LAPTOP15 cho order 3
+-- User chưa sử dụng voucher
+(2, 1, 0, NULL, NULL, '2025-09-15 08:00:00'), -- user01 có SALE10 chưa dùng
+(2, 9, 0, NULL, NULL, '2025-09-16 09:00:00'), -- user01 có FREESHIP chưa dùng
+(3, 3, 0, NULL, NULL, '2025-09-17 10:00:00'), -- user02 có FLASH100K chưa dùng
+(4, 9, 0, NULL, NULL, '2025-09-18 11:00:00'), -- user03 có FREESHIP chưa dùng
+(5, 1, 0, NULL, NULL, '2025-09-19 12:00:00'), -- user04 có SALE10 chưa dùng
+(6, 2, 0, NULL, NULL, '2025-09-20 13:00:00'), -- user05 có WELCOME50K chưa dùng
+(6, 10, 0, NULL, NULL, '2025-09-21 14:00:00'); -- user05 có VIP500K chưa dùng

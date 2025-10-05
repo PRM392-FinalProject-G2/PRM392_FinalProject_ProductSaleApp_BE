@@ -22,12 +22,12 @@ public class OrderRepository : EntityRepository<Order>, IOrderRepository
         return _dbContext.Orders
             .Include(o => o.User)
             .Include(o => o.Cart)
-                .ThenInclude(c => c.CartItems)
+                .ThenInclude(c => c.Cartitems)
                     .ThenInclude(ci => ci.Product)
                         .ThenInclude(p => p.Category)
             .Include(o => o.Payments)
             .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.OrderId == id);
+            .FirstOrDefaultAsync(o => o.Orderid == id);
     }
 
     public override async Task<(IReadOnlyList<Order> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
@@ -35,7 +35,7 @@ public class OrderRepository : EntityRepository<Order>, IOrderRepository
         var query = _dbContext.Orders
             .Include(o => o.User)
             .AsNoTracking()
-            .OrderByDescending(o => o.OrderDate);
+            .OrderByDescending(o => o.Orderdate);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

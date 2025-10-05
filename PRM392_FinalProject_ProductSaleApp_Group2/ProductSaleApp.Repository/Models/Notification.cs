@@ -7,15 +7,15 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Notification
 {
-    public int NotificationId { get; set; }
+    public int Notificationid { get; set; }
 
-    public int? UserId { get; set; }
+    public int? Userid { get; set; }
 
     public string Message { get; set; }
 
-    public bool IsRead { get; set; }
+    public bool Isread { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime Createdat { get; set; }
 
     public virtual User User { get; set; }
 }

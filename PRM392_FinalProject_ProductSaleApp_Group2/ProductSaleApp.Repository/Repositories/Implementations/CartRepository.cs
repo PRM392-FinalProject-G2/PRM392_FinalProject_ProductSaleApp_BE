@@ -21,14 +21,14 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
     {
         return _dbContext.Carts
             .Include(c => c.User)
-            .Include(c => c.CartItems)
+            .Include(c => c.Cartitems)
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p.Category)
-            .Include(p => p.CartItems)
+            .Include(p => p.Cartitems)
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p.Brand)
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.CartId == id);
+            .FirstOrDefaultAsync(c => c.Cartid == id);
     }
 
     public override async Task<(IReadOnlyList<Cart> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
@@ -36,7 +36,7 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
         var query = _dbContext.Carts
             .Include(c => c.User)
             .AsNoTracking()
-            .OrderByDescending(c => c.CartId);
+            .OrderByDescending(c => c.Cartid);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

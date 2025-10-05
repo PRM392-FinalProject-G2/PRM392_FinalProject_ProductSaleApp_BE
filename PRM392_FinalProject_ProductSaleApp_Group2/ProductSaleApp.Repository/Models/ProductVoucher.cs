@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace ProductSaleApp.Repository.Models;
 
-public partial class ProductVoucher
+public partial class Productvoucher
 {
-    public int ProductVoucherId { get; set; }
+    public int Productvoucherid { get; set; }
 
-    public int VoucherId { get; set; }
+    public int Voucherid { get; set; }
 
-    public int ProductId { get; set; }
+    public int Productid { get; set; }
 
     public virtual Product Product { get; set; }
 

@@ -16,63 +16,63 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[Brands]",
+         "Name": "public.brands",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[CartItems]",
+         "Name": "public.cartitems",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Carts]",
+         "Name": "public.carts",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Categories]",
+         "Name": "public.categories",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[ChatMessages]",
+         "Name": "public.chatmessages",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Notifications]",
+         "Name": "public.notifications",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Orders]",
+         "Name": "public.orders",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Payments]",
+         "Name": "public.payments",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Products]",
+         "Name": "public.products",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[ProductVouchers]",
+         "Name": "public.productvouchers",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[StoreLocations]",
+         "Name": "public.storelocations",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Users]",
+         "Name": "public.users",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[UserVouchers]",
+         "Name": "public.uservouchers",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Vouchers]",
+         "Name": "public.vouchers",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Wishlists]",
+         "Name": "public.wishlists",
          "ObjectType": 0
       }
    ],

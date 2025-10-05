@@ -7,13 +7,13 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Wishlist
 {
-    public int WishlistId { get; set; }
+    public int Wishlistid { get; set; }
 
-    public int UserId { get; set; }
+    public int Userid { get; set; }
 
-    public int ProductId { get; set; }
+    public int Productid { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime Createdat { get; set; }
 
     public virtual Product Product { get; set; }
 

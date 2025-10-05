@@ -7,33 +7,33 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class User
 {
-    public int UserId { get; set; }
+    public int Userid { get; set; }
 
     public string Username { get; set; }
 
-    public string PasswordHash { get; set; }
+    public string Passwordhash { get; set; }
 
     public string Email { get; set; }
 
-    public string PhoneNumber { get; set; }
+    public string Phonenumber { get; set; }
 
     public string Address { get; set; }
 
     public string Role { get; set; }
 
-    public string AvatarUrl { get; set; }
+    public string Avatarurl { get; set; }
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
-    public virtual ICollection<ChatMessage> ChatMessageReceivers { get; set; } = new List<ChatMessage>();
+    public virtual ICollection<Chatmessage> ChatmessageReceivers { get; set; } = new List<Chatmessage>();
 
-    public virtual ICollection<ChatMessage> ChatMessageSenders { get; set; } = new List<ChatMessage>();
+    public virtual ICollection<Chatmessage> ChatmessageSenders { get; set; } = new List<Chatmessage>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
+    public virtual ICollection<Uservoucher> Uservouchers { get; set; } = new List<Uservoucher>();
 
     public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

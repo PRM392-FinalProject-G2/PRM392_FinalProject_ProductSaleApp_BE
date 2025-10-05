@@ -1,154 +1,64 @@
-# Visual Studio files
+# Visual Studio cache & temp folders
 .vs/
-.vscode/
-*.suo
+*.vscode/
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
 
-# Visual Studio 2015/2017 cache/options directory
-.vs/
-
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# Files built by Visual Studio
-*_i.c
-*_p.c
-*_h.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.tmp_proj
-*_wpftmp.csproj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
-
-# ReSharper
-_ReSharper*/
-*.[Rr]e[Ss]harper
-*.DotSettings.user
-
-# Visual Studio code coverage results
-*.coverage
-*.coveragexml
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
 
 # NuGet Packages
 *.nupkg
-# NuGet Symbol Packages
 *.snupkg
-# The packages folder can be ignored because of Package Restore
-**/[Pp]ackages/*
-# except build/, which is used as an MSBuild target.
-!**/[Pp]ackages/build/
-# Uncomment if necessary however generally it will be regenerated when needed
-#!**/[Pp]ackages/repositories.config
-# NuGet v3's project.json files produces more ignorable files
-*.nuget.props
-*.nuget.targets
+packages/
+*.nuspec
+*.psmdcp
+# NuGet Symbol Packages
+*.symbols.nupkg
 
-# Microsoft Azure Build Output
-csx/
-*.build.csdef
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
 
-# User-specific files
-*.rsuser
-*.swp
-*.*~
-project.lock.json
-.DS_Store
-*.pyc
-nupkg/
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# Rider
+# DotCover
 .idea/
-*.sln.iml
-
-# User-specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# VS Code directories
-.vscode/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
+*.dotCover
 
 # JetBrains Rider
 .idea/
 *.sln.iml
 
-# User-specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# Other
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
-# Mono auto generated files
-mono_crash.*
+# IIS Express
+/.vs/config/applicationhost.config
+*.vspscc
+*.vssscc
 
-# Secrets
-secrets.json 
-SWD392_GROUP4_EDUCONNECT/appsettings.json
-# Ignore environment-specific appsettings (Development)
-appsettings.Development.json
-**/appsettings.Development.json
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper

@@ -21,14 +21,14 @@ public class VoucherRepository : EntityRepository<Voucher>, IVoucherRepository
     {
         return _dbContext.Vouchers
             .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.VoucherId == id);
+            .FirstOrDefaultAsync(v => v.Voucherid == id);
     }
 
     public override async Task<(IReadOnlyList<Voucher> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
         var query = _dbContext.Vouchers
             .AsNoTracking()
-            .OrderByDescending(v => v.IsActive)
+            .OrderByDescending(v => v.Isactive)
             .ThenBy(v => v.Code);
 
         var total = await query.CountAsync();

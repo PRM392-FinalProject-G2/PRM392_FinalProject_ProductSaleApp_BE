@@ -7,13 +7,13 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Brand
 {
-    public int BrandId { get; set; }
+    public int Brandid { get; set; }
 
-    public string BrandName { get; set; }
+    public string Brandname { get; set; }
 
     public string Description { get; set; }
 
-    public string LogoUrl { get; set; }
+    public string Logourl { get; set; }
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

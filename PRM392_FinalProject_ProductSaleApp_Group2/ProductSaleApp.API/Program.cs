@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductSaleApp.Service.Services.Implementations;
 using ProductSaleApp.Service.Services.Interfaces;
 using ProductSaleApp.Repository.Repositories.Interfaces;
+using ProductSaleApp.Repository.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DbContext
-builder.Services.AddDbContext<ProductSaleApp.Repository.DBContext.SalesAppDBContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+// Add DbContext
+builder.Services.AddDbContext<SalesAppDBContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // Unit of Work / Repositories
 builder.Services.AddScoped<ProductSaleApp.Repository.UnitOfWork.IUnitOfWork, ProductSaleApp.Repository.UnitOfWork.UnitOfWork>();
