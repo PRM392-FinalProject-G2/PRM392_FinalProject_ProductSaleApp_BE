@@ -5,7 +5,11 @@ using ProductSaleApp.Repository.Repositories.Interfaces;
 using ProductSaleApp.Repository.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Cấu hình để chạy trên Docker/Render
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(8080); // Render yêu cầu chạy ở port 8080
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -51,11 +55,8 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
