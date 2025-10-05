@@ -2,7 +2,7 @@ using ProductSaleApp.Repository.Models;
 
 namespace ProductSaleApp.Repository.Repositories.Interfaces;
 
-public interface IProductVoucherRepository : IEntityRepository<ProductVoucher>
+public interface IProductVoucherRepository : IEntityRepository<Productvoucher>
 {
 }
 

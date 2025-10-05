@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ProductSaleApp.Repository.Models;
 
-public partial class StoreLocation
+public partial class Storelocation
 {
-    public int LocationId { get; set; }
+    public int Locationid { get; set; }
 
     public decimal Latitude { get; set; }
 

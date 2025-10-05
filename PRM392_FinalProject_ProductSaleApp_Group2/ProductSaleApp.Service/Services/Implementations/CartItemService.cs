@@ -9,13 +9,13 @@ using ProductSaleApp.Service.Services.Interfaces;
 
 namespace ProductSaleApp.Service.Services.Implementations;
 
-public class CartItemService : CrudService<CartItem, CartItemBM>, ICartItemService
+public class CartItemService : CrudService<Cartitem, CartItemBM>, ICartItemService
 {
     public CartItemService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
     }
 
-    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<CartItem> GetRepository() => UnitOfWork.CartItemRepository;
+    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<Cartitem> GetRepository() => UnitOfWork.CartItemRepository;
 }
 
 

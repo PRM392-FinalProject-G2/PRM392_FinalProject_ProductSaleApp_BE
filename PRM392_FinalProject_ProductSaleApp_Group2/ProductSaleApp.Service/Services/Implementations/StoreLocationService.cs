@@ -9,13 +9,13 @@ using ProductSaleApp.Service.Services.Interfaces;
 
 namespace ProductSaleApp.Service.Services.Implementations;
 
-public class StoreLocationService : CrudService<StoreLocation, StoreLocationBM>, IStoreLocationService
+public class StoreLocationService : CrudService<Storelocation, StoreLocationBM>, IStoreLocationService
 {
     public StoreLocationService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
     }
 
-    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<StoreLocation> GetRepository() => UnitOfWork.StoreLocationRepository;
+    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<Storelocation> GetRepository() => UnitOfWork.StoreLocationRepository;
 }
 
 

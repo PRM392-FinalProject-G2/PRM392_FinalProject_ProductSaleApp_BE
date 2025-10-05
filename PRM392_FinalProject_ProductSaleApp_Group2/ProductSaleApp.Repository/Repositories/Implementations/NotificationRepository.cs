@@ -22,7 +22,7 @@ public class NotificationRepository : EntityRepository<Notification>, INotificat
         return _dbContext.Notifications
             .Include(n => n.User)
             .AsNoTracking()
-            .FirstOrDefaultAsync(n => n.NotificationId == id);
+            .FirstOrDefaultAsync(n => n.Notificationid == id);
     }
 
     public override async Task<(IReadOnlyList<Notification> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
@@ -30,7 +30,7 @@ public class NotificationRepository : EntityRepository<Notification>, INotificat
         var query = _dbContext.Notifications
             .Include(n => n.User)
             .AsNoTracking()
-            .OrderByDescending(n => n.CreatedAt);
+            .OrderByDescending(n => n.Createdat);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

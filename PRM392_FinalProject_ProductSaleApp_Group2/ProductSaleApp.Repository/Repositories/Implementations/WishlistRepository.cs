@@ -23,7 +23,7 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
             .Include(w => w.Product)
             .Include(w => w.User)
             .AsNoTracking()
-            .FirstOrDefaultAsync(w => w.WishlistId == id);
+            .FirstOrDefaultAsync(w => w.Wishlistid == id);
     }
 
     public override async Task<(IReadOnlyList<Wishlist> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
@@ -32,7 +32,7 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
             .Include(w => w.Product)
             .Include(w => w.User)
             .AsNoTracking()
-            .OrderByDescending(w => w.CreatedAt);
+            .OrderByDescending(w => w.Createdat);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

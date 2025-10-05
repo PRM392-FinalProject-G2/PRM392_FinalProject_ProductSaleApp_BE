@@ -7,23 +7,23 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Voucher
 {
-    public int VoucherId { get; set; }
+    public int Voucherid { get; set; }
 
     public string Code { get; set; }
 
     public string Description { get; set; }
 
-    public decimal? DiscountPercent { get; set; }
+    public decimal? Discountpercent { get; set; }
 
-    public decimal? DiscountAmount { get; set; }
+    public decimal? Discountamount { get; set; }
 
-    public DateTime StartDate { get; set; }
+    public DateTime Startdate { get; set; }
 
-    public DateTime EndDate { get; set; }
+    public DateTime Enddate { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool Isactive { get; set; }
 
-    public virtual ICollection<ProductVoucher> ProductVouchers { get; set; } = new List<ProductVoucher>();
+    public virtual ICollection<Productvoucher> Productvouchers { get; set; } = new List<Productvoucher>();
 
-    public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
+    public virtual ICollection<Uservoucher> Uservouchers { get; set; } = new List<Uservoucher>();
 }

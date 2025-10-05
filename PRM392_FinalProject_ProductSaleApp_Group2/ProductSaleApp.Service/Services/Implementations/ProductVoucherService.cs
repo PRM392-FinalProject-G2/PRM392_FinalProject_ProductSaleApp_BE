@@ -6,13 +6,13 @@ using ProductSaleApp.Service.Services.Interfaces;
 
 namespace ProductSaleApp.Service.Services.Implementations;
 
-public class ProductVoucherService : CrudService<ProductVoucher, ProductVoucherBM>, IProductVoucherService
+public class ProductVoucherService : CrudService<Productvoucher, ProductVoucherBM>, IProductVoucherService
 {
     public ProductVoucherService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
     }
 
-    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<ProductVoucher> GetRepository() => UnitOfWork.ProductVoucherRepository;
+    protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<Productvoucher> GetRepository() => UnitOfWork.ProductVoucherRepository;
 }
 
 

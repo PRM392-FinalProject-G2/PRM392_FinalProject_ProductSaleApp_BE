@@ -8,7 +8,7 @@ using ProductSaleApp.Repository.Repositories.Interfaces;
 
 namespace ProductSaleApp.Repository.Repositories.Implementations;
 
-public class StoreLocationRepository : EntityRepository<StoreLocation>, IStoreLocationRepository
+public class StoreLocationRepository : EntityRepository<Storelocation>, IStoreLocationRepository
 {
     private readonly SalesAppDBContext _dbContext;
 
@@ -17,18 +17,18 @@ public class StoreLocationRepository : EntityRepository<StoreLocation>, IStoreLo
         _dbContext = dbContext;
     }
 
-    public override Task<StoreLocation> GetByIdWithDetailsAsync(int id)
+    public override Task<Storelocation> GetByIdWithDetailsAsync(int id)
     {
-        return _dbContext.StoreLocations
+        return _dbContext.Storelocations
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.LocationId == id);
+            .FirstOrDefaultAsync(s => s.Locationid == id);
     }
 
-    public override async Task<(IReadOnlyList<StoreLocation> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
+    public override async Task<(IReadOnlyList<Storelocation> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
-        var query = _dbContext.StoreLocations
+        var query = _dbContext.Storelocations
             .AsNoTracking()
-            .OrderBy(s => s.LocationId);
+            .OrderBy(s => s.Locationid);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

@@ -7,11 +7,11 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Category
 {
-    public int CategoryId { get; set; }
+    public int Categoryid { get; set; }
 
-    public string CategoryName { get; set; }
+    public string Categoryname { get; set; }
 
-    public string ImageUrl { get; set; }
+    public string Imageurl { get; set; }
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

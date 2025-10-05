@@ -5,21 +5,21 @@ using System.Collections.Generic;
 
 namespace ProductSaleApp.Repository.Models;
 
-public partial class UserVoucher
+public partial class Uservoucher
 {
-    public int UserVoucherId { get; set; }
+    public int Uservoucherid { get; set; }
 
-    public int UserId { get; set; }
+    public int Userid { get; set; }
 
-    public int VoucherId { get; set; }
+    public int Voucherid { get; set; }
 
-    public bool IsUsed { get; set; }
+    public bool Isused { get; set; }
 
-    public DateTime? UsedAt { get; set; }
+    public DateTime? Usedat { get; set; }
 
-    public int? OrderId { get; set; }
+    public int? Orderid { get; set; }
 
-    public DateTime AssignedAt { get; set; }
+    public DateTime Assignedat { get; set; }
 
     public virtual Order Order { get; set; }
 

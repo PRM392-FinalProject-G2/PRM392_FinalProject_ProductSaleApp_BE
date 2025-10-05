@@ -21,7 +21,7 @@ public class UserRepository : EntityRepository<User>, IUserRepository
     {
         return _dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.UserId == id);
+            .FirstOrDefaultAsync(u => u.Userid == id);
     }
 
     public override async Task<(IReadOnlyList<User> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
