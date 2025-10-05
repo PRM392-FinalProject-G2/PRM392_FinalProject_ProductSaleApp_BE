@@ -201,8 +201,8 @@ VALUES (10.762622, 106.660172, '268 Lý Thường Kiệt, Quận 10, TP.HCM');
 ================================ */
 INSERT INTO Users (Username, PasswordHash, Email, PhoneNumber, Address, Role, AvatarUrl)
 VALUES
-('admin', 'hash_admin', 'admin@salesapp.com', '0909000001', '268 Lý Thường Kiệt, Q10, HCM', 'Admin', 'https://example.com/avatars/admin.jpg'),
-('user01', 'hash_pw1', 'user01@gmail.com', '0909000002', '12 Lê Lợi, Q1, HCM', 'Customer', 'https://example.com/avatars/user01.jpg'),
+('hau1310', 'WtuvvAnc0apQ8UmR65nUsPqxqYdLiQIvsd83qj6fsPA=', 'ngochau1310@gmail.com', '0333006947', '268 Lý Thường Kiệt, Q10, HCM', 'Admin', 'https://example.com/avatars/admin.jpg'),
+('nhan123', 'NBh1sys/kDeD+4Dd/riCFlNxGOKyLjXBmv4x823w3vs=', 'nhannbse183352@fpt.edu.vn', '0333984762', '12 Lê Lợi, Q1, HCM', 'Customer', 'https://example.com/avatars/user01.jpg'),
 ('user02', 'hash_pw2', 'user02@gmail.com', '0909000003', '34 Hai Bà Trưng, Q1, HCM', 'Customer', 'https://example.com/avatars/user02.jpg'),
 ('user03', 'hash_pw3', 'user03@gmail.com', '0909000004', '56 Nguyễn Trãi, Q5, HCM', 'Customer', 'https://example.com/avatars/user03.jpg'),
 ('user04', 'hash_pw4', 'user04@gmail.com', '0909000005', '78 CMT8, Q3, HCM', 'Customer', 'https://example.com/avatars/user04.jpg'),
