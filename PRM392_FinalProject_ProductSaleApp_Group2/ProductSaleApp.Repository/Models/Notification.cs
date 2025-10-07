@@ -13,7 +13,7 @@ public partial class Notification
 
     public string Message { get; set; }
 
-    public bool Isread { get; set; }
+    public bool? Isread { get; set; }
 
     public DateTime Createdat { get; set; }
 

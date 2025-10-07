@@ -35,6 +35,32 @@ public class VoucherRepository : EntityRepository<Voucher>, IVoucherRepository
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Voucher> Items, int Total)> GetPagedWithDetailsAsync(Voucher filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Vouchers
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Voucherid > 0)
+                query = query.Where(v => v.Voucherid == filter.Voucherid);
+            if (!string.IsNullOrWhiteSpace(filter.Code))
+                query = query.Where(v => v.Code.Contains(filter.Code));
+            // filter.Isactive default is false; only filter when explicitly set true or explicitly false with a flag
+            query = query.Where(v => !filter.Isactive || v.Isactive == filter.Isactive);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(v => v.Isactive)
+            .ThenBy(v => v.Code)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

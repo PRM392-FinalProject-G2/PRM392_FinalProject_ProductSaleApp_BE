@@ -38,6 +38,33 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Wishlist> Items, int Total)> GetPagedWithDetailsAsync(Wishlist filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Wishlists
+            .Include(w => w.Product)
+            .Include(w => w.User)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Wishlistid > 0)
+                query = query.Where(w => w.Wishlistid == filter.Wishlistid);
+            if (filter.Userid > 0)
+                query = query.Where(w => w.Userid == filter.Userid);
+            if (filter.Productid > 0)
+                query = query.Where(w => w.Productid == filter.Productid);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(w => w.Createdat)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

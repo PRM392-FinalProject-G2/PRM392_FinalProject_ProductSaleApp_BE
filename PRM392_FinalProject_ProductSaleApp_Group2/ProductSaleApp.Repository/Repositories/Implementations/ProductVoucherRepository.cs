@@ -38,6 +38,33 @@ public class ProductVoucherRepository : EntityRepository<Productvoucher>, IProdu
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Productvoucher> Items, int Total)> GetPagedWithDetailsAsync(Productvoucher filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Productvouchers
+            .Include(pv => pv.Product)
+            .Include(pv => pv.Voucher)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Productvoucherid > 0)
+                query = query.Where(pv => pv.Productvoucherid == filter.Productvoucherid);
+            if (filter.Productid > 0)
+                query = query.Where(pv => pv.Productid == filter.Productid);
+            if (filter.Voucherid > 0)
+                query = query.Where(pv => pv.Voucherid == filter.Voucherid);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(pv => pv.Productvoucherid)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

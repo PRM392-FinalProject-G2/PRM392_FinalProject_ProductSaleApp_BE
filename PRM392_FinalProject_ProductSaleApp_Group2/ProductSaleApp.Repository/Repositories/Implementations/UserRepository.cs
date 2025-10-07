@@ -34,6 +34,35 @@ public class UserRepository : EntityRepository<User>, IUserRepository
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<User> Items, int Total)> GetPagedWithDetailsAsync(User filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Users
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Userid > 0)
+                query = query.Where(u => u.Userid == filter.Userid);
+            if (!string.IsNullOrWhiteSpace(filter.Username))
+                query = query.Where(u => u.Username.Contains(filter.Username));
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                query = query.Where(u => u.Email.Contains(filter.Email));
+            if (!string.IsNullOrWhiteSpace(filter.Phonenumber))
+                query = query.Where(u => u.Phonenumber.Contains(filter.Phonenumber));
+            if (!string.IsNullOrWhiteSpace(filter.Role))
+                query = query.Where(u => u.Role == filter.Role);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderBy(u => u.Username)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

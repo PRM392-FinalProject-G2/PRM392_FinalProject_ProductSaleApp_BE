@@ -42,6 +42,32 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Cart> Items, int Total)> GetPagedWithDetailsAsync(Cart filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Carts
+            .Include(c => c.User)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Cartid > 0)
+                query = query.Where(c => c.Cartid == filter.Cartid);
+            if (filter.Userid.HasValue)
+                query = query.Where(c => c.Userid == filter.Userid);
+            if (!string.IsNullOrWhiteSpace(filter.Status))
+                query = query.Where(c => c.Status == filter.Status);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(c => c.Cartid)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

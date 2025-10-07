@@ -20,10 +20,11 @@ public class PaymentsController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<PagedResponse<PaymentResponse>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpGet("filter")]
+    public async Task<ActionResult<PagedResponse<PaymentResponse>>> GetFilter([FromQuery] PaymentGetRequest request)
     {
-        var paged = await _service.GetPagedAsync(pageNumber, pageSize);
+        var filter = _mapper.Map<PaymentBM>(request);
+        var paged = await _service.GetPagedFilteredAsync(filter, request.PageNumber, request.PageSize);
         return Ok(_mapper.Map<PagedResponse<PaymentResponse>>(paged));
     }
 

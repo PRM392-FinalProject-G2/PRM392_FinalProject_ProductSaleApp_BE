@@ -38,6 +38,35 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Product> Items, int Total)> GetPagedWithDetailsAsync(Product filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Productid > 0)
+                query = query.Where(p => p.Productid == filter.Productid);
+            if (!string.IsNullOrWhiteSpace(filter.Productname))
+                query = query.Where(p => p.Productname.Contains(filter.Productname));
+            if (filter.Categoryid.HasValue)
+                query = query.Where(p => p.Categoryid == filter.Categoryid);
+            if (filter.Brandid.HasValue)
+                query = query.Where(p => p.Brandid == filter.Brandid);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(p => p.Productid)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 

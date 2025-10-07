@@ -38,6 +38,33 @@ public class ChatMessageRepository : EntityRepository<Chatmessage>, IChatMessage
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return (items, total);
     }
+
+    public async Task<(IReadOnlyList<Chatmessage> Items, int Total)> GetPagedWithDetailsAsync(Chatmessage filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Chatmessages
+            .Include(cm => cm.Sender)
+            .Include(cm => cm.Receiver)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Chatmessageid > 0)
+                query = query.Where(cm => cm.Chatmessageid == filter.Chatmessageid);
+            if (filter.Senderid > 0)
+                query = query.Where(cm => cm.Senderid == filter.Senderid);
+            if (filter.Receiverid > 0)
+                query = query.Where(cm => cm.Receiverid == filter.Receiverid);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(cm => cm.Sentat)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
 }
 
 
