@@ -20,10 +20,11 @@ public class VouchersController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<PagedResponse<VoucherResponse>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpGet("filter")]
+    public async Task<ActionResult<PagedResponse<VoucherResponse>>> GetFilter([FromQuery] VoucherGetRequest request)
     {
-        var paged = await _service.GetPagedAsync(pageNumber, pageSize);
+        var filter = _mapper.Map<VoucherBM>(request);
+        var paged = await _service.GetPagedFilteredAsync(filter, request.PageNumber, request.PageSize);
         return Ok(_mapper.Map<PagedResponse<VoucherResponse>>(paged));
     }
 

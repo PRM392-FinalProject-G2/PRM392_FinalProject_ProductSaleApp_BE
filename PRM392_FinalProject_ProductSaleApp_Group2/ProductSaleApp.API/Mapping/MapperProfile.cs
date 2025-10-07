@@ -15,19 +15,33 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductSaleApp.Service.BusinessModel.AuthBM, ProductSaleApp.API.Models.ResponseModel.Auth.AuthResponse>();
 
             CreateMap<ProductRequest, ProductBM>();
+            CreateMap<ProductGetRequest, ProductBM>();
             CreateMap<BrandRequest, BrandBM>();
+            CreateMap<BrandGetRequest, BrandBM>();
             CreateMap<CartRequest, CartBM>();
+            CreateMap<CartGetRequest, CartBM>();
             CreateMap<CartItemRequest, CartItemBM>();
+            CreateMap<CartItemGetRequest, CartItemBM>();
             CreateMap<OrderRequest, OrderBM>();
+            CreateMap<OrderGetRequest, OrderBM>();
             CreateMap<PaymentRequest, PaymentBM>();
+            CreateMap<PaymentGetRequest, PaymentBM>();
             CreateMap<UserRequest, UserBM>();
+            CreateMap<UserGetRequest, UserBM>();
             CreateMap<NotificationRequest, NotificationBM>();
+            CreateMap<NotificationGetRequest, NotificationBM>();
             CreateMap<ChatMessageRequest, ChatMessageBM>();
+            CreateMap<ChatMessageGetRequest, ChatMessageBM>();
             CreateMap<StoreLocationRequest, StoreLocationBM>();
             CreateMap<VoucherRequest, VoucherBM>();
+            CreateMap<VoucherGetRequest, VoucherBM>();
             CreateMap<ProductVoucherRequest, ProductVoucherBM>();
+            CreateMap<ProductVoucherGetRequest, ProductVoucherBM>();
             CreateMap<UserVoucherRequest, UserVoucherBM>();
+            CreateMap<UserVoucherGetRequest, UserVoucherBM>();
             CreateMap<WishlistRequest, WishlistBM>();
+            CreateMap<WishlistGetRequest, WishlistBM>();
+            CreateMap<CategoryGetRequest, CategoryBM>();
 
             CreateMap<ProductBM, ProductResponse>();
             CreateMap<BrandBM, BrandResponse>();

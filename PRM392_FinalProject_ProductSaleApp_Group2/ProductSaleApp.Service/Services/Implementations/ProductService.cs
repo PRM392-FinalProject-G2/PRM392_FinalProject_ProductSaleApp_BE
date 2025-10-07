@@ -10,11 +10,38 @@ namespace ProductSaleApp.Service.Services.Implementations;
 
 public class ProductService : CrudService<Product, ProductBM>, IProductService
 {
+    private readonly IMapper _mapper;
+
     public ProductService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
+        _mapper = mapper;
     }
 
     protected override ProductSaleApp.Repository.Repositories.Interfaces.IEntityRepository<Product> GetRepository() => UnitOfWork.ProductRepository;
+
+    public async Task<PagedResult<ProductBM>> GetPagedFilteredAsync(ProductBM filter, int pageNumber, int pageSize)
+    {
+        var repo = UnitOfWork.ProductRepository;
+        var repositoryFilter = new Product
+        {
+            Productid = filter?.ProductId ?? 0,
+            Productname = filter?.ProductName,
+            Categoryid = filter?.CategoryId,
+            Brandid = filter?.BrandId
+        };
+
+        var (entities, total) = await repo.GetPagedWithDetailsAsync(repositoryFilter, pageNumber, pageSize);
+        var items = _mapper.Map<IReadOnlyList<ProductBM>>(entities);
+        var totalPages = (int)Math.Ceiling((double)total / pageSize);
+        return new PagedResult<ProductBM>
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = total,
+            TotalPages = totalPages,
+            Items = items
+        };
+    }
 }
 
 

@@ -4,6 +4,7 @@ namespace ProductSaleApp.Service.Services.Interfaces;
 
 public interface IUserService : ICrudService<UserBM>
 {
+    Task<PagedResult<UserBM>> GetPagedFilteredAsync(UserBM filter, int pageNumber, int pageSize);
 }
 
 

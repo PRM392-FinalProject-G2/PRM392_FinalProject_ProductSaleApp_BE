@@ -4,6 +4,7 @@ namespace ProductSaleApp.Service.Services.Interfaces;
 
 public interface ICartService : ICrudService<CartBM>
 {
+    Task<PagedResult<CartBM>> GetPagedFilteredAsync(CartBM filter, int pageNumber, int pageSize);
 }
 
 
