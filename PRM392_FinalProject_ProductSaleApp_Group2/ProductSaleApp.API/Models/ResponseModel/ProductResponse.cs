@@ -10,8 +10,10 @@ public class ProductResponse
     public decimal Price { get; set; }
     public string ImageUrl { get; set; }
     public int? CategoryId { get; set; }
+    public int? BrandId { get; set; }
 
     public CategoryResponse Category { get; set; }
+    public BrandResponse Brand { get; set; }
 }
 
 

@@ -7,23 +7,31 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Product
 {
-    public int ProductId { get; set; }
+    public int Productid { get; set; }
 
-    public string ProductName { get; set; }
+    public string Productname { get; set; }
 
-    public string BriefDescription { get; set; }
+    public string Briefdescription { get; set; }
 
-    public string FullDescription { get; set; }
+    public string Fulldescription { get; set; }
 
-    public string TechnicalSpecifications { get; set; }
+    public string Technicalspecifications { get; set; }
 
     public decimal Price { get; set; }
 
-    public string ImageUrl { get; set; }
+    public string Imageurl { get; set; }
 
-    public int? CategoryId { get; set; }
+    public int? Categoryid { get; set; }
 
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+    public int? Brandid { get; set; }
+
+    public virtual Brand Brand { get; set; }
+
+    public virtual ICollection<Cartitem> Cartitems { get; set; } = new List<Cartitem>();
 
     public virtual Category Category { get; set; }
+
+    public virtual ICollection<Productvoucher> Productvouchers { get; set; } = new List<Productvoucher>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

@@ -5,15 +5,19 @@ using System.Collections.Generic;
 
 namespace ProductSaleApp.Repository.Models;
 
-public partial class ChatMessage
+public partial class Chatmessage
 {
-    public int ChatMessageId { get; set; }
+    public int Chatmessageid { get; set; }
 
-    public int? UserId { get; set; }
+    public int Senderid { get; set; }
+
+    public int Receiverid { get; set; }
 
     public string Message { get; set; }
 
-    public DateTime SentAt { get; set; }
+    public DateTime Sentat { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual User Receiver { get; set; }
+
+    public virtual User Sender { get; set; }
 }

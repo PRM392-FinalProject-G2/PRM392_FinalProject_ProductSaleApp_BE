@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace ProductSaleApp.Repository.Models;
 
-public partial class CartItem
+public partial class Cartitem
 {
-    public int CartItemId { get; set; }
+    public int Cartitemid { get; set; }
 
-    public int? CartId { get; set; }
+    public int? Cartid { get; set; }
 
-    public int? ProductId { get; set; }
+    public int? Productid { get; set; }
 
     public int Quantity { get; set; }
 

@@ -21,17 +21,40 @@ public class CategoryRepository : EntityRepository<Category>, ICategoryRepositor
     {
         return _dbContext.Categories
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.CategoryId == id);
+            .FirstOrDefaultAsync(c => c.Categoryid == id);
     }
 
     public override async Task<(IReadOnlyList<Category> Items, int Total)> GetPagedWithDetailsAsync(int pageNumber, int pageSize)
     {
         var query = _dbContext.Categories
             .AsNoTracking()
-            .OrderBy(c => c.CategoryName);
+            .OrderBy(c => c.Categoryname);
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        return (items, total);
+    }
+
+    public async Task<(IReadOnlyList<Category> Items, int Total)> GetPagedWithDetailsAsync(Category filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Categories
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Categoryid > 0)
+                query = query.Where(c => c.Categoryid == filter.Categoryid);
+            if (!string.IsNullOrWhiteSpace(filter.Categoryname))
+                query = query.Where(c => c.Categoryname.Contains(filter.Categoryname));
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderBy(c => c.Categoryname)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
         return (items, total);
     }
 }

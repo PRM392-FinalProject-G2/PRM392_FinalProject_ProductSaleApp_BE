@@ -20,10 +20,11 @@ public class CartItemsController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<PagedResponse<CartItemResponse>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpGet("filter")]
+    public async Task<ActionResult<PagedResponse<CartItemResponse>>> GetFilter([FromQuery] CartItemGetRequest request)
     {
-        var paged = await _service.GetPagedAsync(pageNumber, pageSize);
+        var filter = _mapper.Map<CartItemBM>(request);
+        var paged = await _service.GetPagedFilteredAsync(filter, request.PageNumber, request.PageSize);
         return Ok(_mapper.Map<PagedResponse<CartItemResponse>>(paged));
     }
 

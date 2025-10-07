@@ -7,15 +7,15 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Cart
 {
-    public int CartId { get; set; }
+    public int Cartid { get; set; }
 
-    public int? UserId { get; set; }
+    public int? Userid { get; set; }
 
-    public decimal TotalPrice { get; set; }
+    public decimal Totalprice { get; set; }
 
     public string Status { get; set; }
 
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+    public virtual ICollection<Cartitem> Cartitems { get; set; } = new List<Cartitem>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

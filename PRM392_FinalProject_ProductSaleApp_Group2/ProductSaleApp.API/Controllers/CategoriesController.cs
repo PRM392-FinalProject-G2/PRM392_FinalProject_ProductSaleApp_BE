@@ -20,10 +20,11 @@ public class CategoriesController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<PagedResponse<CategoryResponse>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpGet("filter")]
+    public async Task<ActionResult<PagedResponse<CategoryResponse>>> GetFilter([FromQuery] CategoryGetRequest request)
     {
-        var paged = await _service.GetPagedAsync(pageNumber, pageSize);
+        var filter = _mapper.Map<CategoryBM>(request);
+        var paged = await _service.GetPagedFilteredAsync(filter, request.PageNumber, request.PageSize);
         return Ok(_mapper.Map<PagedResponse<CategoryResponse>>(paged));
     }
 

@@ -7,23 +7,25 @@ namespace ProductSaleApp.Repository.Models;
 
 public partial class Order
 {
-    public int OrderId { get; set; }
+    public int Orderid { get; set; }
 
-    public int? CartId { get; set; }
+    public int? Cartid { get; set; }
 
-    public int? UserId { get; set; }
+    public int? Userid { get; set; }
 
-    public string PaymentMethod { get; set; }
+    public string Paymentmethod { get; set; }
 
-    public string BillingAddress { get; set; }
+    public string Billingaddress { get; set; }
 
-    public string OrderStatus { get; set; }
+    public string Orderstatus { get; set; }
 
-    public DateTime OrderDate { get; set; }
+    public DateTime Orderdate { get; set; }
 
     public virtual Cart Cart { get; set; }
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual User User { get; set; }
+
+    public virtual ICollection<Uservoucher> Uservouchers { get; set; } = new List<Uservoucher>();
 }

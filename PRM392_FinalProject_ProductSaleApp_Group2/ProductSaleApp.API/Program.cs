@@ -2,9 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using ProductSaleApp.Service.Services.Implementations;
 using ProductSaleApp.Service.Services.Interfaces;
 using ProductSaleApp.Repository.Repositories.Interfaces;
+using ProductSaleApp.Repository.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Cấu hình để chạy trên Docker/Render
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(8080); // Render yêu cầu chạy ở port 8080
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -12,12 +17,28 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DbContext
-builder.Services.AddDbContext<ProductSaleApp.Repository.DBContext.SalesAppDBContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+// Add DbContext
+builder.Services.AddDbContext<SalesAppDBContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder =>
+        {
+            builder.WithOrigins(
+                    "http://localhost:5173",
+                    "http://localhost:3000",
+                    "http://127.0.0.1:5500",
+                    "http://localhost:5500"
+                 )
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
+});
 // Unit of Work / Repositories
 builder.Services.AddScoped<ProductSaleApp.Repository.UnitOfWork.IUnitOfWork, ProductSaleApp.Repository.UnitOfWork.UnitOfWork>();
 
@@ -39,6 +60,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
 builder.Services.AddScoped<IStoreLocationService, StoreLocationService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IProductVoucherService, ProductVoucherService>();
+builder.Services.AddScoped<IUserVoucherService, UserVoucherService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW
@@ -46,13 +73,10 @@ builder.Services.AddScoped<IStoreLocationService, StoreLocationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
