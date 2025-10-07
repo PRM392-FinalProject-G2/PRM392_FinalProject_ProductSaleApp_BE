@@ -41,7 +41,8 @@ public class AuthService : IAuthService
             Email = model.Email,
             Phonenumber = model.PhoneNumber,
             Passwordhash = HashPassword(model.Password),
-            Role = "User"
+            Role = "Customer",
+            Avatarurl = "https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759829766/1053244_uifxod.png"
         };
         await _unitOfWork.UserRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();

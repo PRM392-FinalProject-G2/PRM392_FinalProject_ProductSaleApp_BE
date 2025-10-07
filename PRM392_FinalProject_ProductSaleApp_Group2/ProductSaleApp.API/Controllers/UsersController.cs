@@ -13,11 +13,13 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _service;
     private readonly IMapper _mapper;
+    private readonly IPhotoService _photoService;
 
-    public UsersController(IUserService service, IMapper mapper)
+    public UsersController(IUserService service, IMapper mapper, IPhotoService photoService)
     {
         _service = service;
         _mapper = mapper;
+        _photoService = photoService;
     }
 
     [HttpGet("filter")]
@@ -45,9 +47,21 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<UserResponse>> Update(int id, UserRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<UserResponse>> Update(int id, [FromForm] UserRequest request)
     {
-        var updated = await _service.UpdateAsync(id, _mapper.Map<UserBM>(request));
+        var model = _mapper.Map<UserBM>(request);
+
+        if (request.AvatarFile != null && request.AvatarFile.Length > 0)
+        {
+            var url = await _photoService.UploadImageAsync(request.AvatarFile);
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                model.Avatarurl = url;
+            }
+        }
+
+        var updated = await _service.UpdateAsync(id, model);
         if (updated == null) return NotFound();
         return Ok(_mapper.Map<UserResponse>(updated));
     }
