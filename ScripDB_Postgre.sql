@@ -232,9 +232,9 @@ VALUES
 INSERT INTO Categories (CategoryName, ImageUrl)
 VALUES
 ('Điện thoại', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834355/iphone17s-removebg-preview_ocdb5m.png'),
-('Laptop', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834356/laptop-removebg-preview_jngmru.png'),
-('Đồ gia dụng', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834357/dogiadung-removebg-preview_hjb22m.png'),
-('Phụ kiện', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834355/PhukienRemove_pp3p1l.png');
+('Laptop', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840893/laptop-removebg-preview_1_wu51sl.png'),
+('Đồ gia dụng', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840825/dogiadung-removebg-preview_1_thydjm.png'),
+('Phụ kiện', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840873/PhukienRemove_1_mrv6ey.png');
 
 /* ================================
    Insert Brands (6 brands)
