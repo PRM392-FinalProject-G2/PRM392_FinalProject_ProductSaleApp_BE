@@ -11,6 +11,8 @@ public class UserBM
     public string PhoneNumber { get; set; }
     public string Address { get; set; }
     public string Role { get; set; }
+    public string Avatarurl { get; set; }
+
 
     public IReadOnlyList<CartBM> Carts { get; set; }
     public IReadOnlyList<ChatMessageBM> ChatMessages { get; set; }

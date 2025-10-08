@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ProductSaleApp.Repository.Models;
@@ -20,12 +21,16 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
+    private readonly IMemoryCache _cache;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
+    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration, IMemoryCache cache, IEmailService emailService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _configuration = configuration;
+        _cache = cache;
+        _emailService = emailService;
     }
 
     public async Task<AuthBM> RegisterAsync(RegisterBM model)
@@ -41,7 +46,8 @@ public class AuthService : IAuthService
             Email = model.Email,
             Phonenumber = model.PhoneNumber,
             Passwordhash = HashPassword(model.Password),
-            Role = "User"
+            Role = "Customer",
+            Avatarurl = "https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759829766/1053244_uifxod.png"
         };
         await _unitOfWork.UserRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
@@ -66,6 +72,108 @@ public class AuthService : IAuthService
     {
         // Stateless JWT: nothing to do server-side
         return Task.FromResult(true);
+    }
+
+    public async Task<bool> RequestOtpAsync(RequestOtpBM model)
+    {
+        // Check if email matches the userId
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(model.UserId);
+        if (user == null || user.Email != model.Email)
+        {
+            return false;
+        }
+
+        // Generate 4-digit OTP
+        var random = new Random();
+        var otp = random.Next(1000, 9999).ToString();
+
+        // Store OTP in cache with 5 minutes expiration
+        var cacheKey = $"OTP_{model.Email}";
+        _cache.Set(cacheKey, otp, TimeSpan.FromMinutes(5));
+
+        // Send OTP via email
+        var emailSent = await _emailService.SendOtpEmailAsync(model.Email, otp);
+        
+        return emailSent;
+    }
+
+    public Task<ResetTokenBM> VerifyOtpAsync(VerifyOtpBM model)
+    {
+        var cacheKey = $"OTP_{model.Email}";
+        
+        if (_cache.TryGetValue(cacheKey, out string cachedOtp))
+        {
+            if (cachedOtp == model.Otp)
+            {
+                // Generate reset token
+                var resetToken = Guid.NewGuid().ToString("N");
+                var resetTokenKey = $"RESET_TOKEN_{model.Email}";
+                var expiresInSeconds = 600; // 10 minutes
+                
+                // Store reset token in cache
+                _cache.Set(resetTokenKey, resetToken, TimeSpan.FromSeconds(expiresInSeconds));
+                
+                // Remove OTP from cache (one-time use)
+                _cache.Remove(cacheKey);
+                
+                return Task.FromResult(new ResetTokenBM
+                {
+                    Success = true,
+                    Message = "OTP verified successfully. You can now reset your password.",
+                    ResetToken = resetToken,
+                    ExpiresInSeconds = expiresInSeconds
+                });
+            }
+        }
+
+        return Task.FromResult(new ResetTokenBM
+        {
+            Success = false,
+            Message = "Invalid or expired OTP",
+            ResetToken = null,
+            ExpiresInSeconds = 0
+        });
+    }
+
+    public async Task<bool> ChangePasswordAsync(ChangePasswordBM model)
+    {
+        // Verify reset token
+        var resetTokenKey = $"RESET_TOKEN_{model.Email}";
+        
+        if (!_cache.TryGetValue(resetTokenKey, out string cachedToken))
+        {
+            return false; // Token not found or expired
+        }
+        
+        if (cachedToken != model.ResetToken)
+        {
+            return false; // Invalid token
+        }
+
+        // Check if passwords match
+        if (model.NewPassword != model.ConfirmPassword)
+        {
+            return false;
+        }
+
+        // Find user by email
+        var users = await _unitOfWork.Repository<User>().GetAllAsync(u => u.Email == model.Email);
+        var user = users.FirstOrDefault();
+        
+        if (user == null)
+        {
+            return false;
+        }
+
+        // Update password
+        user.Passwordhash = HashPassword(model.NewPassword);
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        // Remove reset token from cache after successful password change
+        _cache.Remove(resetTokenKey);
+
+        return true;
     }
 
     private string HashPassword(string password)

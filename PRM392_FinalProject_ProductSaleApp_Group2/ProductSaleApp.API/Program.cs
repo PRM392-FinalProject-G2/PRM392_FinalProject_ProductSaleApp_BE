@@ -3,6 +3,7 @@ using ProductSaleApp.Service.Services.Implementations;
 using ProductSaleApp.Service.Services.Interfaces;
 using ProductSaleApp.Repository.Repositories.Interfaces;
 using ProductSaleApp.Repository.DBContext;
+using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 // Cấu hình để chạy trên Docker/Render
@@ -16,6 +17,18 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+
+// Add Cloudinary
+var cloudinaryAccount = new Account(
+    builder.Configuration["CloudinarySettings:CloudName"],
+    builder.Configuration["CloudinarySettings:ApiKey"],
+    builder.Configuration["CloudinarySettings:ApiSecret"]
+);
+var cloudinary = new Cloudinary(cloudinaryAccount);
+builder.Services.AddSingleton(cloudinary);
 
 // Add DbContext
 builder.Services.AddDbContext<SalesAppDBContext>(options =>
@@ -66,6 +79,8 @@ builder.Services.AddScoped<IProductVoucherService, ProductVoucherService>();
 builder.Services.AddScoped<IUserVoucherService, UserVoucherService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW

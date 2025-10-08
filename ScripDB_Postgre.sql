@@ -1,3 +1,21 @@
+DROP TABLE IF EXISTS 
+    ProductVouchers,
+    UserVouchers,
+    Vouchers,
+    Wishlists,
+    StoreLocations,
+    ChatMessages,
+    Notifications,
+    Payments,
+    Orders,
+    CartItems,
+    Carts,
+    Products,
+    Brands,
+    Categories,
+    Users
+CASCADE;
+
 /* ================================
    Bảng Users
 ================================ */
@@ -201,10 +219,10 @@ VALUES (10.762622, 106.660172, '268 Lý Thường Kiệt, Quận 10, TP.HCM');
 ================================ */
 INSERT INTO Users (Username, PasswordHash, Email, PhoneNumber, Address, Role, AvatarUrl)
 VALUES
-('hau1310', 'WtuvvAnc0apQ8UmR65nUsPqxqYdLiQIvsd83qj6fsPA=', 'ngochau1310@gmail.com', '0333006947', '268 Lý Thường Kiệt, Q10, HCM', 'Admin', 'https://example.com/avatars/admin.jpg'),
-('nhan123', 'NBh1sys/kDeD+4Dd/riCFlNxGOKyLjXBmv4x823w3vs=', 'nhannbse183352@fpt.edu.vn', '0333984762', '12 Lê Lợi, Q1, HCM', 'Customer', 'https://example.com/avatars/user01.jpg'),
-('user02', 'hash_pw2', 'user02@gmail.com', '0909000003', '34 Hai Bà Trưng, Q1, HCM', 'Customer', 'https://example.com/avatars/user02.jpg'),
-('user03', 'hash_pw3', 'user03@gmail.com', '0909000004', '56 Nguyễn Trãi, Q5, HCM', 'Customer', 'https://example.com/avatars/user03.jpg'),
+('hau1310', 'WtuvvAnc0apQ8UmR65nUsPqxqYdLiQIvsd83qj6fsPA=', 'ngochau1310@gmail.com', '0333006947', '268 Lý Thường Kiệt, Q10, HCM', 'Admin', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759833475/Hau_r3dqvg.jpg'),
+('nhan123', 'NBh1sys/kDeD+4Dd/riCFlNxGOKyLjXBmv4x823w3vs=', 'nhannbse183352@fpt.edu.vn', '0333984762', '12 Lê Lợi, Q1, HCM', 'Customer', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759833606/fotor-face-swap-20251003223459_velc22.jpg'),
+('huy123', 'NBh1sys/kDeD+4Dd/riCFlNxGOKyLjXBmv4x823w3vs=', 'huynqse183261@fpt.edu.vn', '0909000003', '34 Hai Bà Trưng, Q1, HCM', 'Customer', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759833818/image-4_rfw4da.png'),
+('quoc123', 'NBh1sys/kDeD+4Dd/riCFlNxGOKyLjXBmv4x823w3vs=', 'quocthkse183295@fpt.edu.vn', '0909000004', '56 Nguyễn Trãi, Q5, HCM', 'Customer', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759833818/image_auvknc.png'),
 ('user04', 'hash_pw4', 'user04@gmail.com', '0909000005', '78 CMT8, Q3, HCM', 'Customer', 'https://example.com/avatars/user04.jpg'),
 ('user05', 'hash_pw5', 'user05@gmail.com', '0909000006', '90 Pasteur, Q1, HCM', 'Customer', 'https://example.com/avatars/user05.jpg');
 
@@ -213,22 +231,22 @@ VALUES
 ================================ */
 INSERT INTO Categories (CategoryName, ImageUrl)
 VALUES
-('Điện thoại', 'https://example.com/categories/phone.jpg'),
-('Laptop', 'https://example.com/categories/laptop.jpg'),
-('Thiết bị gia dụng', 'https://example.com/categories/appliance.jpg'),
-('Phụ kiện', 'https://example.com/categories/accessory.jpg');
+('Điện thoại', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834355/iphone17s-removebg-preview_ocdb5m.png'),
+('Laptop', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840893/laptop-removebg-preview_1_wu51sl.png'),
+('Đồ gia dụng', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840825/dogiadung-removebg-preview_1_thydjm.png'),
+('Phụ kiện', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759840873/PhukienRemove_1_mrv6ey.png');
 
 /* ================================
    Insert Brands (6 brands)
 ================================ */
 INSERT INTO Brands (BrandName, Description, LogoUrl)
 VALUES
-('Apple', 'Thương hiệu công nghệ hàng đầu thế giới', 'https://example.com/brands/apple.png'),
-('Samsung', 'Tập đoàn điện tử Hàn Quốc', 'https://example.com/brands/samsung.png'),
-('Xiaomi', 'Thương hiệu điện tử Trung Quốc', 'https://example.com/brands/xiaomi.png'),
-('Dell', 'Thương hiệu máy tính Mỹ', 'https://example.com/brands/dell.png'),
-('LG', 'Tập đoàn điện tử Hàn Quốc', 'https://example.com/brands/lg.png'),
-('Sony', 'Tập đoàn giải trí và điện tử Nhật Bản', 'https://example.com/brands/sony.png');
+('Apple', 'Thương hiệu công nghệ hàng đầu thế giới', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834575/8ed3d547-94ff-48e1-9f20-8c14a7030a02_2000x2000_wla77t.jpg'),
+('Samsung', 'Tập đoàn điện tử Hàn Quốc', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834575/SAMSUNG_oujj7x.avif'),
+('Xiaomi', 'Thương hiệu điện tử Trung Quốc', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834575/Xiaomi_logo__2021-.svg_harbst.png'),
+('Dell', 'Thương hiệu máy tính Mỹ', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834574/Dell_Logo.svg_uvnbsv.png'),
+('LG', 'Tập đoàn điện tử Hàn Quốc', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834574/LG_symbol.svg_pctfqc.png'),
+('Sony', 'Tập đoàn giải trí và điện tử Nhật Bản', 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834574/sony-logo-sony-icon-transparent-free_vvjcck.webp');
 
 /* ================================
    Insert Products (20 sản phẩm)
@@ -236,31 +254,31 @@ VALUES
 INSERT INTO Products (ProductName, BriefDescription, FullDescription, TechnicalSpecifications, Price, ImageURL, CategoryID, BrandID)
 VALUES
 -- APPLE
-('iPhone 15 Pro', 'Smartphone cao cấp', 'Điện thoại Apple iPhone 15 Pro 256GB', 'Chip A17 Pro, 6GB RAM, 256GB ROM', 28990000, 'https://example.com/iphone15.jpg', 1, 1),
-('iPhone 14', 'Smartphone phổ thông', 'Điện thoại Apple iPhone 14 128GB', 'Chip A15 Bionic, 6GB RAM, 128GB ROM', 19990000, 'https://example.com/iphone14.jpg', 1, 1),
-('MacBook Air M2', 'Laptop mỏng nhẹ', 'MacBook Air M2 2023', 'Apple M2, 16GB RAM, 512GB SSD', 31990000, 'https://example.com/macbookair.jpg', 2, 1),
-('MacBook Pro 14', 'Laptop hiệu năng cao', 'MacBook Pro 14 inch M2 Pro', 'Apple M2 Pro, 32GB RAM, 1TB SSD', 52990000, 'https://example.com/mbp14.jpg', 2, 1),
-('Apple Watch Ultra', 'Đồng hồ thông minh', 'Apple Watch Ultra 49mm', 'Chip S8, chống nước 100m', 19990000, 'https://example.com/applewatch.jpg', 4, 1),
-('AirPods Pro 2', 'Tai nghe không dây', 'Apple AirPods Pro Gen 2', 'ANC, Adaptive Transparency', 5990000, 'https://example.com/airpodspro2.jpg', 4, 1),
+('iPhone 15 Pro', 'Smartphone cao cấp', 'Điện thoại Apple iPhone 15 Pro 256GB', 'Chip A17 Pro, 6GB RAM, 256GB ROM', 28990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834883/iphone-15-pro-xanh-halo_jet8zc.png', 1, 1),
+('iPhone 14', 'Smartphone phổ thông', 'Điện thoại Apple iPhone 14 128GB', 'Chip A15 Bionic, 6GB RAM, 128GB ROM', 19990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834883/iphone-14-pro-29-ff5703aa-730b-41fb-a818-3e4a2bd7c314-removebg-preview_ednzkc.png', 1, 1),
+('MacBook Air M2', 'Laptop mỏng nhẹ', 'MacBook Air M2 2023', 'Apple M2, 16GB RAM, 512GB SSD', 31990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834883/macbook_air_13_m2_midnight_1_35053fbcf9-removebg-preview_mvvl33.png', 2, 1),
+('MacBook Pro 14', 'Laptop hiệu năng cao', 'MacBook Pro 14 inch M2 Pro', 'Apple M2 Pro, 32GB RAM, 1TB SSD', 52990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834882/6fylky7q-138-macbook-pro-14-m1-pro-16gb-1tb-like-new-removebg-preview_tmio89.png', 2, 1),
+('Apple Watch Ultra', 'Đồng hồ thông minh', 'Apple Watch Ultra 49mm', 'Chip S8, chống nước 100m', 19990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834885/MT653_VW_34FRwatch-49-titanium-ultra2_VW_34FRwatch-face-49-ocean-ultra2_VW_34FR-scaled-removebg-preview_hyksbd.png', 4, 1),
+('AirPods Pro 2', 'Tai nghe không dây', 'Apple AirPods Pro Gen 2', 'ANC, Adaptive Transparency', 5990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759834882/tai-nghe-bluetooth-airpods-pro-2nd-gen-usb-c-charge-apple-1-750x500-removebg-preview_rjtzpw.png', 4, 1),
 -- SAMSUNG
-('Samsung Galaxy S23', 'Android flagship', 'Samsung Galaxy S23 Ultra 256GB', 'Snapdragon 8 Gen 2, 12GB RAM, 256GB ROM', 25990000, 'https://example.com/s23.jpg', 1, 2),
-('Samsung Galaxy A54', 'Smartphone tầm trung', 'Samsung Galaxy A54 5G 128GB', 'Exynos 1380, 8GB RAM, 128GB ROM', 9990000, 'https://example.com/a54.jpg', 1, 2),
-('Samsung Tủ lạnh Inverter', 'Tủ lạnh tiết kiệm điện', 'Tủ lạnh Samsung Inverter 450L', 'Ngăn đá trên, công nghệ Digital Inverter', 13990000, 'https://example.com/samsungfridge.jpg', 3, 2),
-('Samsung Máy giặt AI', 'Máy giặt thông minh', 'Máy giặt Samsung AI Inverter 10kg', 'AI Control, Eco Bubble', 10990000, 'https://example.com/samsungwm.jpg', 3, 2),
-('Samsung Galaxy Buds2 Pro', 'Tai nghe không dây', 'Samsung Galaxy Buds2 Pro', 'ANC, Bluetooth 5.3', 4990000, 'https://example.com/buds2.jpg', 4, 2),
+('Samsung Galaxy S23', 'Android flagship', 'Samsung Galaxy S23 Ultra 256GB', 'Snapdragon 8 Gen 2, 12GB RAM, 256GB ROM', 25990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835187/616xeaUEdbL._AC_SL1500_-removebg-preview_qnzv36.png', 1, 2),
+('Samsung Galaxy A54', 'Smartphone tầm trung', 'Samsung Galaxy A54 5G 128GB', 'Exynos 1380, 8GB RAM, 128GB ROM', 9990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835186/3d9a1a4ed9ed0496f0d1bc7e03b81e947e4d40ea-removebg-preview_uqhibl.png', 1, 2),
+('Samsung Tủ lạnh Inverter', 'Tủ lạnh tiết kiệm điện', 'Tủ lạnh Samsung Inverter 450L', 'Ngăn đá trên, công nghệ Digital Inverter', 13990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835186/tu-lanh-samsung-rf48a4010m9-sv-1_1654181912-removebg-preview_blkljw.png', 3, 2),
+('Samsung Máy giặt AI', 'Máy giặt thông minh', 'Máy giặt Samsung AI Inverter 10kg', 'AI Control, Eco Bubble', 10990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835264/qkl1637641932-removebg-preview_n8wuti.png', 3, 2),
+('Samsung Galaxy Buds2 Pro', 'Tai nghe không dây', 'Samsung Galaxy Buds2 Pro', 'ANC, Bluetooth 5.3', 4990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835187/Tai-nghe-Bluetooth-Samsung-Galaxy-Buds2-Pro-removebg-preview_rkmvfe.png', 4, 2),
 -- XIAOMI
-('Xiaomi 13 Pro', 'Flagship camera', 'Xiaomi 13 Pro 256GB', 'Snapdragon 8 Gen 2, Camera Leica', 18990000, 'https://example.com/mi13pro.jpg', 1, 3),
-('Xiaomi Redmi Note 12', 'Giá rẻ hiệu năng cao', 'Redmi Note 12 128GB', 'Snapdragon 4 Gen 1, 6GB RAM, 128GB ROM', 5990000, 'https://example.com/redmi12.jpg', 1, 3),
-('Xiaomi Robot Vacuum', 'Robot hút bụi', 'Xiaomi Robot Vacuum S10+', 'LDS Navigation, 4000Pa', 7990000, 'https://example.com/mivacuum.jpg', 3, 3),
-('Xiaomi Buds 4 Pro', 'Tai nghe cao cấp', 'Xiaomi Buds 4 Pro', 'ANC, LHDC 5.0', 2990000, 'https://example.com/mibuds4.jpg', 4, 3),
+('Xiaomi 13 Pro', 'Flagship camera', 'Xiaomi 13 Pro 256GB', 'Snapdragon 8 Gen 2, Camera Leica', 18990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835185/xiaomi-13-pro-9-removebg-preview_f8jc8t.png', 1, 3),
+('Xiaomi Redmi Note 12', 'Giá rẻ hiệu năng cao', 'Redmi Note 12 128GB', 'Snapdragon 4 Gen 1, 6GB RAM, 128GB ROM', 5990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835647/xiaomi-redmi-note-12-vang-1-thumb-momo-600x600-removebg-preview_h5v5kp.png', 1, 3),
+('Xiaomi Robot Vacuum', 'Robot hút bụi', 'Xiaomi Robot Vacuum S10+', 'LDS Navigation, 4000Pa', 7990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835751/0034208_xiaomi-robot-vacuum-e5_d6ubys.png', 3, 3),
+('Xiaomi Buds 4 Pro', 'Tai nghe cao cấp', 'Xiaomi Buds 4 Pro', 'ANC, LHDC 5.0', 2990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835645/xiaomi_buds_4_pro_5-removebg-preview_eddlnp.png', 4, 3),
 -- DELL
-('Dell XPS 13', 'Ultrabook cao cấp', 'Dell XPS 13 2023', 'Core i7, 16GB RAM, 512GB SSD', 38990000, 'https://example.com/xps13.jpg', 2, 4),
-('Dell Inspiron 15', 'Laptop văn phòng', 'Dell Inspiron 15 3520', 'Core i5, 8GB RAM, 512GB SSD', 15990000, 'https://example.com/inspiron15.jpg', 2, 4),
+('Dell XPS 13', 'Ultrabook cao cấp', 'Dell XPS 13 2023', 'Core i7, 16GB RAM, 512GB SSD', 38990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835644/71okgs_gpel._ac_sl1496__6f9861a5e6764448abf1fb93c2f57015_master-removebg-preview_rmkhe3.png', 2, 4),
+('Dell Inspiron 15', 'Laptop văn phòng', 'Dell Inspiron 15 3520', 'Core i5, 8GB RAM, 512GB SSD', 15990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835643/71nP6lTogjL._AC_SL1500_-removebg-preview_r0hoyp.png', 2, 4),
 -- LG
-('LG Tủ lạnh Inverter', 'Tủ lạnh tiết kiệm điện', 'Tủ lạnh LG Inverter 420L', 'Ngăn đá trên, tiết kiệm điện A++', 11990000, 'https://example.com/lgfridge.jpg', 3, 5),
-('LG Máy lạnh Dual Inverter', 'Điều hòa cao cấp', 'Máy lạnh LG Dual Inverter 1.5HP', 'Turbo Cooling, tiết kiệm điện', 8990000, 'https://example.com/lgac.jpg', 3, 5),
+('LG Tủ lạnh Inverter', 'Tủ lạnh tiết kiệm điện', 'Tủ lạnh LG Inverter 420L', 'Ngăn đá trên, tiết kiệm điện A++', 11990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835643/tu-lanh-sbs-lg-inverter-635l-gr-x257bg_d6a2ee2d-removebg-preview_qtrqjr.png', 3, 5),
+('LG Máy lạnh Dual Inverter', 'Điều hòa cao cấp', 'Máy lạnh LG Dual Inverter 1.5HP', 'Turbo Cooling, tiết kiệm điện', 8990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835642/lg-inverter-1-hp-v10win1-1-1-700x467-removebg-preview_hujngy.png', 3, 5),
 -- SONY
-('Sony WH-1000XM5', 'Tai nghe chống ồn', 'Sony WH-1000XM5 Over-ear', 'ANC, Pin 30h', 8990000, 'https://example.com/sony1000xm5.jpg', 4, 6);
+('Sony WH-1000XM5', 'Tai nghe chống ồn', 'Sony WH-1000XM5 Over-ear', 'ANC, Pin 30h', 8990000, 'https://res.cloudinary.com/dx3fdlq2p/image/upload/v1759835776/3123_tai_nghe_sony_wh_1000xm5_blue_songlongmedia-removebg-preview_old5bc.png', 4, 6);
 
 /* ================================
    Insert Carts

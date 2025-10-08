@@ -13,6 +13,10 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.LoginRequest, ProductSaleApp.Service.BusinessModel.LoginBM>();
             CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.RegisterRequest, ProductSaleApp.Service.BusinessModel.RegisterBM>();
             CreateMap<ProductSaleApp.Service.BusinessModel.AuthBM, ProductSaleApp.API.Models.ResponseModel.Auth.AuthResponse>();
+            CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.RequestOtpRequest, ProductSaleApp.Service.BusinessModel.RequestOtpBM>();
+            CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.VerifyOtpRequest, ProductSaleApp.Service.BusinessModel.VerifyOtpBM>();
+            CreateMap<ProductSaleApp.API.Models.RequestModel.Auth.ChangePasswordRequest, ProductSaleApp.Service.BusinessModel.ChangePasswordBM>();
+            CreateMap<ProductSaleApp.Service.BusinessModel.ResetTokenBM, ProductSaleApp.API.Models.ResponseModel.Auth.ResetTokenResponse>();
 
             CreateMap<ProductRequest, ProductBM>();
             CreateMap<ProductGetRequest, ProductBM>();
