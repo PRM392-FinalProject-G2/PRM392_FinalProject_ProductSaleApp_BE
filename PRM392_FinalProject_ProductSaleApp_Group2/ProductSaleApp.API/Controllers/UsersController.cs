@@ -48,10 +48,19 @@ public class UsersController : ControllerBase
 
     [HttpPut("{id:int}")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<UserResponse>> Update(int id, [FromForm] UserRequest request)
+    public async Task<ActionResult<UserResponse>> Update(int id, [FromForm] UserUpdateRequest request)
     {
+        // Lấy thông tin user hiện tại
+        var existingUser = await _service.GetByIdAsync(id, includeDetails: false);
+        if (existingUser == null) return NotFound();
+
         var model = _mapper.Map<UserBM>(request);
 
+        // Giữ nguyên password và role từ user hiện tại (không cho phép cập nhật)
+        model.PasswordHash = existingUser.PasswordHash;
+        model.Role = existingUser.Role;
+
+        // Chỉ cập nhật avatarUrl khi có AvatarFile mới
         if (request.AvatarFile != null && request.AvatarFile.Length > 0)
         {
             var url = await _photoService.UploadImageAsync(request.AvatarFile);
@@ -59,6 +68,11 @@ public class UsersController : ControllerBase
             {
                 model.Avatarurl = url;
             }
+        }
+        else
+        {
+            // Giữ nguyên avatarUrl hiện tại nếu không có file mới
+            model.Avatarurl = existingUser.Avatarurl;
         }
 
         var updated = await _service.UpdateAsync(id, model);
