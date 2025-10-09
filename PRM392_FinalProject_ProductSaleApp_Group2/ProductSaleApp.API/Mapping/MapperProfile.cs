@@ -31,6 +31,7 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<PaymentRequest, PaymentBM>();
             CreateMap<PaymentGetRequest, PaymentBM>();
             CreateMap<UserRequest, UserBM>();
+            CreateMap<UserUpdateRequest, UserBM>();
             CreateMap<UserGetRequest, UserBM>();
             CreateMap<NotificationRequest, NotificationBM>();
             CreateMap<NotificationGetRequest, NotificationBM>();
