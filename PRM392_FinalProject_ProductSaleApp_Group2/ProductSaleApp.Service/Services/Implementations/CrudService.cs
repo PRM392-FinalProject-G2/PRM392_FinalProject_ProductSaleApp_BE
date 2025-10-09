@@ -60,7 +60,8 @@ public abstract class CrudService<TEntity, TBusinessModel> : ICrudService<TBusin
     public virtual async Task<TBusinessModel> UpdateAsync(int id, TBusinessModel model)
     {
         var repo = GetRepository();
-        var existing = await repo.GetByIdAsync(id);
+        // Use tracking = true for update operations
+        var existing = await repo.GetByIdAsync(id, trackChanges: true);
         if (existing == null)
         {
             return default;
@@ -75,7 +76,8 @@ public abstract class CrudService<TEntity, TBusinessModel> : ICrudService<TBusin
     public async Task<bool> DeleteAsync(int id)
     {
         var repo = GetRepository();
-        var existing = await repo.GetByIdAsync(id);
+        // Use tracking = true for delete operations
+        var existing = await repo.GetByIdAsync(id, trackChanges: true);
         if (existing == null)
         {
             return false;
