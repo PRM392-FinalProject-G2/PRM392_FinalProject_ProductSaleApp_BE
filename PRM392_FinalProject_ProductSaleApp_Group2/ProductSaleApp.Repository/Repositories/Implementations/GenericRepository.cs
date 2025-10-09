@@ -20,14 +20,20 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         _dbSet = _dbContext.Set<TEntity>();
     }
 
-    public async Task<TEntity> GetByIdAsync(object id, params Expression<Func<TEntity, object>>[] includes)
+    public Task<TEntity> GetByIdAsync(object id, params Expression<Func<TEntity, object>>[] includes)
+    {
+        // Default: no tracking (for read-only operations)
+        return GetByIdAsync(id, trackChanges: false, includes);
+    }
+
+    public async Task<TEntity> GetByIdAsync(object id, bool trackChanges, params Expression<Func<TEntity, object>>[] includes)
     {
         var entityType = _dbContext.Model.FindEntityType(typeof(TEntity));
         var key = entityType.FindPrimaryKey();
 
         if (key.Properties.Count != 1)
         {
-            // Fallback: FindAsync for composite keys without includes
+            // Fallback: FindAsync for composite keys (always tracked)
             return await _dbSet.FindAsync(id);
         }
 
@@ -52,7 +58,13 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         var body = Expression.Equal(property, constant);
         var lambda = Expression.Lambda<Func<TEntity, bool>>(body, parameter);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(lambda);
+        // Apply tracking based on parameter
+        if (!trackChanges)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query.FirstOrDefaultAsync(lambda);
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAllAsync(

@@ -44,6 +44,30 @@ public class UserService : CrudService<User, UserBM>, IUserService
             Items = items
         };
     }
+
+    public async Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        var repo = UnitOfWork.UserRepository;
+        var count = await repo.CountAsync(u => 
+            u.Email == email && 
+            (!excludeUserId.HasValue || u.Userid != excludeUserId.Value));
+        return count > 0;
+    }
+
+    public async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int? excludeUserId = null)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+            return false;
+
+        var repo = UnitOfWork.UserRepository;
+        var count = await repo.CountAsync(u => 
+            u.Phonenumber == phoneNumber && 
+            (!excludeUserId.HasValue || u.Userid != excludeUserId.Value));
+        return count > 0;
+    }
 }
 
 
