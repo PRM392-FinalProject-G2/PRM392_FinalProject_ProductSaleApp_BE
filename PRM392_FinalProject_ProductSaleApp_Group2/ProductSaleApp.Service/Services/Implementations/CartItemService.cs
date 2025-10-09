@@ -42,6 +42,26 @@ public class CartItemService : CrudService<Cartitem, CartItemBM>, ICartItemServi
             Items = items
         };
     }
+
+    public override async Task<CartItemBM> UpdateAsync(int id, CartItemBM model)
+    {
+        var repo = UnitOfWork.CartItemRepository;
+        var existing = await repo.GetByIdAsync(id);
+
+        if (existing == null)
+            return default;
+
+        existing.Quantity = model.Quantity;
+        existing.Price = model.Price;
+        existing.Productid = model.ProductId;
+        existing.Cartid = model.CartId;
+
+        repo.Update(existing);
+        await UnitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<CartItemBM>(existing);
+    }
+
 }
 
 
