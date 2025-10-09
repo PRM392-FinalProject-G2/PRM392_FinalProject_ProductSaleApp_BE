@@ -57,7 +57,7 @@ public abstract class CrudService<TEntity, TBusinessModel> : ICrudService<TBusin
         return _mapper.Map<TBusinessModel>(entity);
     }
 
-    public async Task<TBusinessModel> UpdateAsync(int id, TBusinessModel model)
+    public virtual async Task<TBusinessModel> UpdateAsync(int id, TBusinessModel model)
     {
         var repo = GetRepository();
         var existing = await repo.GetByIdAsync(id);
