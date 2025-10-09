@@ -47,6 +47,9 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
     {
         var query = _dbContext.Carts
             .Include(c => c.User)
+            .Include(c => c.Cartitems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Category)
             .AsNoTracking()
             .AsQueryable();
 
