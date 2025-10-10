@@ -50,6 +50,9 @@ public class UserVoucherRepository : EntityRepository<Uservoucher>, IUserVoucher
             .AsNoTracking()
             .AsQueryable();
 
+        // Filter only active vouchers
+        query = query.Where(uv => uv.Voucher.Isactive);
+
         if (filter != null)
         {
             if (filter.Uservoucherid > 0)

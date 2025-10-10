@@ -48,6 +48,10 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<WishlistRequest, WishlistBM>();
             CreateMap<WishlistGetRequest, WishlistBM>();
             CreateMap<CategoryGetRequest, CategoryBM>();
+            CreateMap<ProductImageRequest, ProductImageBM>();
+            CreateMap<ProductImageGetRequest, ProductImageBM>();
+            CreateMap<ProductReviewRequest, ProductReviewBM>();
+            CreateMap<ProductReviewGetRequest, ProductReviewBM>();
 
             CreateMap<ProductBM, ProductResponse>();
             CreateMap<BrandBM, BrandResponse>();
@@ -64,6 +68,10 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductVoucherBM, ProductVoucherResponse>();
             CreateMap<UserVoucherBM, UserVoucherResponse>();
             CreateMap<WishlistBM, WishlistResponse>();
+            CreateMap<ProductImageBM, ProductImageResponse>();
+            CreateMap<ProductReviewBM, ProductReviewResponse>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
+                .ForMember(dest => dest.UserAvatarUrl, opt => opt.MapFrom(src => src.User != null ? src.User.Avatarurl : null));
 
             CreateMap(typeof(PagedResult<>), typeof(PagedResponse<>));
         }
