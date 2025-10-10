@@ -31,7 +31,8 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<PaymentRequest, PaymentBM>();
             CreateMap<PaymentGetRequest, PaymentBM>();
             CreateMap<UserRequest, UserBM>();
-            CreateMap<UserUpdateRequest, UserBM>();
+            CreateMap<UserUpdateRequest, UserBM>()
+                .ForMember(dest => dest.Username, opt => opt.Ignore()); // Không cho phép cập nhật Username
             CreateMap<UserGetRequest, UserBM>();
             CreateMap<NotificationRequest, NotificationBM>();
             CreateMap<NotificationGetRequest, NotificationBM>();

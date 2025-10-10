@@ -9,6 +9,8 @@ namespace ProductSaleApp.Repository.Repositories.Interfaces;
 public interface IGenericRepository<TEntity> where TEntity : class
 {
     Task<TEntity> GetByIdAsync(object id, params Expression<Func<TEntity, object>>[] includes);
+    
+    Task<TEntity> GetByIdAsync(object id, bool trackChanges, params Expression<Func<TEntity, object>>[] includes);
 
     Task<IReadOnlyList<TEntity>> GetAllAsync(
         Expression<Func<TEntity, bool>> predicate = null,
