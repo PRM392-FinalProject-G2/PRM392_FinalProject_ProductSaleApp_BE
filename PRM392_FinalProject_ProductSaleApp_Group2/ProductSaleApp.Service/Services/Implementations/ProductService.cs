@@ -42,6 +42,25 @@ public class ProductService : CrudService<Product, ProductBM>, IProductService
             Items = items
         };
     }
+
+    public async Task<bool> IncrementPopularityAsync(IEnumerable<int> productIds, int delta = 1)
+    {
+        var repo = UnitOfWork.ProductRepository;
+        var updated = false;
+        foreach (var id in productIds.Distinct())
+        {
+            var entity = await repo.GetByIdAsync(id, trackChanges: true);
+            if (entity == null) continue;
+            entity.Popularity += delta;
+            repo.Update(entity);
+            updated = true;
+        }
+        if (updated)
+        {
+            await UnitOfWork.SaveChangesAsync();
+        }
+        return updated;
+    }
 }
 
 
