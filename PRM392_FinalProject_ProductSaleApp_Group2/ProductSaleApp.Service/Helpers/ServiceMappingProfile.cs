@@ -23,8 +23,40 @@ public class ServiceMappingProfile : Profile
         CreateMap<Brand, BrandBM>().ReverseMap();
         CreateMap<Cart, CartBM>().ReverseMap();
         CreateMap<Cartitem, CartItemBM>().ReverseMap();
-        CreateMap<Order, OrderBM>().ReverseMap();
-        CreateMap<Payment, PaymentBM>().ReverseMap();
+
+        // Order mapping: ensure DB snake_case <-> BM camelCase, UserId mapped
+        CreateMap<Order, OrderBM>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Orderid))
+            .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.Cartid))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.Paymentmethod))
+            .ForMember(dest => dest.BillingAddress, opt => opt.MapFrom(src => src.Billingaddress))
+            .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Orderstatus))
+            .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.Orderdate))
+            .ReverseMap()
+            .ForMember(dest => dest.Orderid, opt => opt.Ignore())
+            .ForMember(dest => dest.Cartid, opt => opt.MapFrom(src => src.CartId))
+            .ForMember(dest => dest.Userid, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Paymentmethod, opt => opt.MapFrom(src => src.PaymentMethod))
+            .ForMember(dest => dest.Billingaddress, opt => opt.MapFrom(src => src.BillingAddress))
+            .ForMember(dest => dest.Orderstatus, opt => opt.MapFrom(src => src.OrderStatus))
+            .ForMember(dest => dest.Orderdate, opt => opt.MapFrom(src => src.OrderDate))
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.Cart, opt => opt.Ignore())
+            .ForMember(dest => dest.Payments, opt => opt.Ignore())
+            .ForMember(dest => dest.Uservouchers, opt => opt.Ignore());
+
+        // Payment mapping: ensure OrderId maps to Orderid on save
+        CreateMap<Payment, PaymentBM>()
+            .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.Paymentid))
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Orderid))
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.Paymentstatus))
+            .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.Paymentdate))
+            .ReverseMap()
+            .ForMember(dest => dest.Paymentid, opt => opt.Ignore())
+            .ForMember(dest => dest.Orderid, opt => opt.MapFrom(src => src.OrderId))
+            .ForMember(dest => dest.Order, opt => opt.Ignore());
         
         // User mapping with explicit property mapping for case-sensitive fields
         CreateMap<User, UserBM>()

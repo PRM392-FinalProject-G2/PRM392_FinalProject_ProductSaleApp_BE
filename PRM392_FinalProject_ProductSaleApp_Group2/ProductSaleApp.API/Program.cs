@@ -64,8 +64,6 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Services
 builder.Services.AddScoped<IProductService,ProductService>();
-builder.Services.AddScoped<IProductImageService, ProductImageService>();
-builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
@@ -83,6 +81,7 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW
