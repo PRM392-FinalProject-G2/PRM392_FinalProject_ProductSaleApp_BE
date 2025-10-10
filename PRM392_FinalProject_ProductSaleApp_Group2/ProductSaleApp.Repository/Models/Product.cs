@@ -19,17 +19,25 @@ public partial class Product
 
     public decimal Price { get; set; }
 
-    public string Imageurl { get; set; }
-
     public int? Categoryid { get; set; }
 
     public int? Brandid { get; set; }
+
+    public int Popularity { get; set; }
+
+    public decimal Averagerating { get; set; }
+
+    public int Reviewcount { get; set; }
 
     public virtual Brand Brand { get; set; }
 
     public virtual ICollection<Cartitem> Cartitems { get; set; } = new List<Cartitem>();
 
     public virtual Category Category { get; set; }
+
+    public virtual ICollection<Productimage> Productimages { get; set; } = new List<Productimage>();
+
+    public virtual ICollection<Productreview> Productreviews { get; set; } = new List<Productreview>();
 
     public virtual ICollection<Productvoucher> Productvouchers { get; set; } = new List<Productvoucher>();
 
