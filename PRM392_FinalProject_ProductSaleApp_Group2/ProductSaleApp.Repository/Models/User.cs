@@ -35,6 +35,8 @@ public partial class User
 
     public virtual ICollection<Productreview> Productreviews { get; set; } = new List<Productreview>();
 
+    public virtual ICollection<Userdevicetoken> Userdevicetokens { get; set; } = new List<Userdevicetoken>();
+
     public virtual ICollection<Uservoucher> Uservouchers { get; set; } = new List<Uservoucher>();
 
     public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();

@@ -30,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     private IProductVoucherRepository _productVoucherRepository;
     private IUserVoucherRepository _userVoucherRepository;
     private IWishlistRepository _wishlistRepository;
+    private IUserDeviceTokenRepository _userDeviceTokenRepository;
 
     public UnitOfWork(SalesAppDBContext dbContext)
     {
@@ -66,6 +67,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductVoucherRepository ProductVoucherRepository => _productVoucherRepository ??= new ProductVoucherRepository(_dbContext);
     public IUserVoucherRepository UserVoucherRepository => _userVoucherRepository ??= new UserVoucherRepository(_dbContext);
     public IWishlistRepository WishlistRepository => _wishlistRepository ??= new WishlistRepository(_dbContext);
+    public IUserDeviceTokenRepository UserDeviceTokenRepository => _userDeviceTokenRepository ??= new UserDeviceTokenRepository(_dbContext);
 
     public Task<int> SaveChangesAsync()
     {

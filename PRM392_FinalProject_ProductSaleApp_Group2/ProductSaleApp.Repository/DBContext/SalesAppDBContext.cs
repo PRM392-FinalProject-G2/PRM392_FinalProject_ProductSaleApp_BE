@@ -42,6 +42,8 @@ public partial class SalesAppDBContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Userdevicetoken> Userdevicetokens { get; set; }
+
     public virtual DbSet<Uservoucher> Uservouchers { get; set; }
 
     public virtual DbSet<Voucher> Vouchers { get; set; }
@@ -403,6 +405,34 @@ public partial class SalesAppDBContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<Userdevicetoken>(entity =>
+        {
+            entity.HasKey(e => e.Tokenid).HasName("userdevicetokens_pkey");
+
+            entity.ToTable("userdevicetokens");
+
+            entity.HasIndex(e => e.Userid, "ix_userdevicetokens_userid");
+
+            entity.HasIndex(e => e.Fcmtoken, "uq_userdevicetokens_fcmtoken").IsUnique();
+
+            entity.Property(e => e.Tokenid).HasColumnName("tokenid");
+            entity.Property(e => e.Fcmtoken)
+                .IsRequired()
+                .HasColumnName("fcmtoken");
+            entity.Property(e => e.Isactive)
+                .HasDefaultValue(true)
+                .HasColumnName("isactive");
+            entity.Property(e => e.Lastupdateddate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("lastupdateddate");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Userdevicetokens)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("fk_userdevicetokens_users");
         });
 
         modelBuilder.Entity<Uservoucher>(entity =>
