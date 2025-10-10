@@ -11,3 +11,4 @@ public class VnPaySettings
     public string Locale { get; set; }
     public string CurrCode { get; set; }
 } 
+

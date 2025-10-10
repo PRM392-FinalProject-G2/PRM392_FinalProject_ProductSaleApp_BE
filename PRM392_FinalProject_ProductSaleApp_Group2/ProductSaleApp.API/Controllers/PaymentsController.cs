@@ -129,7 +129,14 @@ public class PaymentsController : ControllerBase
         {
             var cart = await _cartService.GetByIdAsync(order.CartId.Value);
             if (cart == null) return BadRequest("Cart not found");
-            amount = cart.TotalPrice;
+            if (cart.CartItems != null && cart.CartItems.Count > 0)
+            {
+                amount = cart.CartItems.Sum(ci => ci.Price * ci.Quantity);
+            }
+            else
+            {
+                amount = cart.TotalPrice;
+            }
         }
         else
         {
