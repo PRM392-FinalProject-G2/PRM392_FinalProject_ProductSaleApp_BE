@@ -22,6 +22,9 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
         return _dbContext.Products
             .Include(p => p.Category)
             .Include(p => p.Brand)
+            .Include(p => p.Productimages)
+            .Include(p => p.Productreviews)
+                .ThenInclude(pr => pr.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Productid == id);
     }
@@ -31,6 +34,9 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
         var query = _dbContext.Products
             .Include(p => p.Category)
             .Include(p => p.Brand)
+            .Include(p => p.Productimages)
+            .Include(p => p.Productreviews)
+                .ThenInclude(pr => pr.User)
             .AsNoTracking()
             .OrderByDescending(p => p.Productid);
 
@@ -44,6 +50,9 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
         var query = _dbContext.Products
             .Include(p => p.Category)
             .Include(p => p.Brand)
+            .Include(p => p.Productimages)
+            .Include(p => p.Productreviews)
+                .ThenInclude(pr => pr.User)
             .AsNoTracking()
             .AsQueryable();
 

@@ -48,6 +48,14 @@
          "ObjectType": 0
       },
       {
+         "Name": "public.productimages",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.productreviews",
+         "ObjectType": 0
+      },
+      {
          "Name": "public.products",
          "ObjectType": 0
       },

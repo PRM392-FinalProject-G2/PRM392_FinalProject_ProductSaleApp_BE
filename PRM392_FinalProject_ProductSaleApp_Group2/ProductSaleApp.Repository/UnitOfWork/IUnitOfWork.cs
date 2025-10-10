@@ -10,6 +10,8 @@ public interface IUnitOfWork : IDisposable
 
     // Strong-typed repositories
     IProductRepository ProductRepository { get; }
+    IProductImageRepository ProductImageRepository { get; }
+    IProductReviewRepository ProductReviewRepository { get; }
     ICategoryRepository CategoryRepository { get; }
     ICartRepository CartRepository { get; }
     ICartItemRepository CartItemRepository { get; }

@@ -64,6 +64,8 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Services
 builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
+builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();

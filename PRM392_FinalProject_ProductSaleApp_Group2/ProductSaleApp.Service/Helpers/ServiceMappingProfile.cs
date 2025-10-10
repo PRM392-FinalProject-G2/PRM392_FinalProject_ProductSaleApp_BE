@@ -10,7 +10,16 @@ public class ServiceMappingProfile : Profile
     {
             // Auth BMs map to Repository models where needed are handled in service, not here
         CreateMap<Category, CategoryBM>().ReverseMap();
-        CreateMap<Product, ProductBM>().ReverseMap();
+        
+        // Product mapping - ignore navigation collections when mapping back
+        CreateMap<Product, ProductBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Cartitems, opt => opt.Ignore())
+            .ForMember(dest => dest.Productvouchers, opt => opt.Ignore())
+            .ForMember(dest => dest.Wishlists, opt => opt.Ignore())
+            .ForMember(dest => dest.Productimages, opt => opt.Ignore())
+            .ForMember(dest => dest.Productreviews, opt => opt.Ignore());
+        
         CreateMap<Brand, BrandBM>().ReverseMap();
         CreateMap<Cart, CartBM>().ReverseMap();
         CreateMap<Cartitem, CartItemBM>().ReverseMap();
@@ -36,6 +45,17 @@ public class ServiceMappingProfile : Profile
         CreateMap<Productvoucher, ProductVoucherBM>().ReverseMap();
         CreateMap<Uservoucher, UserVoucherBM>().ReverseMap();
         CreateMap<Wishlist, WishlistBM>().ReverseMap();
+        
+        // ProductImage mapping - ignore navigation property to avoid circular reference
+        CreateMap<Productimage, ProductImageBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Product, opt => opt.Ignore());
+        
+        // ProductReview mapping - include User but ignore Product navigation property
+        CreateMap<Productreview, ProductReviewBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Product, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore());
     }
 }
 
