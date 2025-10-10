@@ -26,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     IProductVoucherRepository ProductVoucherRepository { get; }
     IUserVoucherRepository UserVoucherRepository { get; }
     IWishlistRepository WishlistRepository { get; }
+    IUserDeviceTokenRepository UserDeviceTokenRepository { get; }
 
     Task<int> SaveChangesAsync();
 }

@@ -68,6 +68,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "public.userdevicetokens",
+         "ObjectType": 0
+      },
+      {
          "Name": "public.users",
          "ObjectType": 0
       },
