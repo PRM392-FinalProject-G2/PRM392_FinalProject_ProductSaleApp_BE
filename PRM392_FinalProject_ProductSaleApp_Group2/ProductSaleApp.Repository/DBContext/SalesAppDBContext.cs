@@ -32,11 +32,17 @@ public partial class SalesAppDBContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<Productimage> Productimages { get; set; }
+
+    public virtual DbSet<Productreview> Productreviews { get; set; }
+
     public virtual DbSet<Productvoucher> Productvouchers { get; set; }
 
     public virtual DbSet<Storelocation> Storelocations { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<Userdevicetoken> Userdevicetokens { get; set; }
 
     public virtual DbSet<Uservoucher> Uservouchers { get; set; }
 
@@ -242,15 +248,19 @@ public partial class SalesAppDBContext : DbContext
             entity.ToTable("products");
 
             entity.Property(e => e.Productid).HasColumnName("productid");
+            entity.Property(e => e.Averagerating)
+                .HasPrecision(3, 2)
+                .HasDefaultValueSql("0.00")
+                .HasColumnName("averagerating");
             entity.Property(e => e.Brandid).HasColumnName("brandid");
             entity.Property(e => e.Briefdescription)
                 .HasMaxLength(255)
                 .HasColumnName("briefdescription");
             entity.Property(e => e.Categoryid).HasColumnName("categoryid");
             entity.Property(e => e.Fulldescription).HasColumnName("fulldescription");
-            entity.Property(e => e.Imageurl)
-                .HasMaxLength(255)
-                .HasColumnName("imageurl");
+            entity.Property(e => e.Popularity)
+                .HasDefaultValue(0)
+                .HasColumnName("popularity");
             entity.Property(e => e.Price)
                 .HasPrecision(18, 2)
                 .HasColumnName("price");
@@ -258,6 +268,9 @@ public partial class SalesAppDBContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("productname");
+            entity.Property(e => e.Reviewcount)
+                .HasDefaultValue(0)
+                .HasColumnName("reviewcount");
             entity.Property(e => e.Technicalspecifications).HasColumnName("technicalspecifications");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.Products)
@@ -267,6 +280,55 @@ public partial class SalesAppDBContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.Categoryid)
                 .HasConstraintName("products_categoryid_fkey");
+        });
+
+        modelBuilder.Entity<Productimage>(entity =>
+        {
+            entity.HasKey(e => e.Imageid).HasName("productimages_pkey");
+
+            entity.ToTable("productimages");
+
+            entity.Property(e => e.Imageid).HasColumnName("imageid");
+            entity.Property(e => e.Imageurl)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("imageurl");
+            entity.Property(e => e.Isprimary)
+                .HasDefaultValue(false)
+                .HasColumnName("isprimary");
+            entity.Property(e => e.Productid).HasColumnName("productid");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.Productimages)
+                .HasForeignKey(d => d.Productid)
+                .HasConstraintName("productimages_productid_fkey");
+        });
+
+        modelBuilder.Entity<Productreview>(entity =>
+        {
+            entity.HasKey(e => e.Reviewid).HasName("productreviews_pkey");
+
+            entity.ToTable("productreviews");
+
+            entity.HasIndex(e => new { e.Userid, e.Productid }, "uq_user_product_review").IsUnique();
+
+            entity.Property(e => e.Reviewid).HasColumnName("reviewid");
+            entity.Property(e => e.Comment).HasColumnName("comment");
+            entity.Property(e => e.Createdat)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("createdat");
+            entity.Property(e => e.Productid).HasColumnName("productid");
+            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.Productreviews)
+                .HasForeignKey(d => d.Productid)
+                .HasConstraintName("productreviews_productid_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Productreviews)
+                .HasForeignKey(d => d.Userid)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("productreviews_userid_fkey");
         });
 
         modelBuilder.Entity<Productvoucher>(entity =>
@@ -343,6 +405,34 @@ public partial class SalesAppDBContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<Userdevicetoken>(entity =>
+        {
+            entity.HasKey(e => e.Tokenid).HasName("userdevicetokens_pkey");
+
+            entity.ToTable("userdevicetokens");
+
+            entity.HasIndex(e => e.Userid, "ix_userdevicetokens_userid");
+
+            entity.HasIndex(e => e.Fcmtoken, "uq_userdevicetokens_fcmtoken").IsUnique();
+
+            entity.Property(e => e.Tokenid).HasColumnName("tokenid");
+            entity.Property(e => e.Fcmtoken)
+                .IsRequired()
+                .HasColumnName("fcmtoken");
+            entity.Property(e => e.Isactive)
+                .HasDefaultValue(true)
+                .HasColumnName("isactive");
+            entity.Property(e => e.Lastupdateddate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("lastupdateddate");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Userdevicetokens)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("fk_userdevicetokens_users");
         });
 
         modelBuilder.Entity<Uservoucher>(entity =>

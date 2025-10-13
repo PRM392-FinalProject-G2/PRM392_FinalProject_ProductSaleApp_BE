@@ -18,6 +18,7 @@ public class UserBM
     public IReadOnlyList<ChatMessageBM> ChatMessages { get; set; }
     public IReadOnlyList<NotificationBM> Notifications { get; set; }
     public IReadOnlyList<OrderBM> Orders { get; set; }
+    public IReadOnlyList<ProductReviewBM> ProductReviews { get; set; }
 }
 
 

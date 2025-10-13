@@ -10,6 +10,8 @@ public interface IUnitOfWork : IDisposable
 
     // Strong-typed repositories
     IProductRepository ProductRepository { get; }
+    IProductImageRepository ProductImageRepository { get; }
+    IProductReviewRepository ProductReviewRepository { get; }
     ICategoryRepository CategoryRepository { get; }
     ICartRepository CartRepository { get; }
     ICartItemRepository CartItemRepository { get; }
@@ -24,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     IProductVoucherRepository ProductVoucherRepository { get; }
     IUserVoucherRepository UserVoucherRepository { get; }
     IWishlistRepository WishlistRepository { get; }
+    IUserDeviceTokenRepository UserDeviceTokenRepository { get; }
 
     Task<int> SaveChangesAsync();
 }
