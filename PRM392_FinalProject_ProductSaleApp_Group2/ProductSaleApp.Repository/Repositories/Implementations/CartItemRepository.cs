@@ -24,6 +24,8 @@ public class CartItemRepository : EntityRepository<Cartitem>, ICartItemRepositor
                 .ThenInclude(p => p.Category)
             .Include(c => c.Product)
                 .ThenInclude(p => p.Brand)
+            .Include(ci => ci.Product)
+                .ThenInclude(p => p.Productimages)
             .AsNoTracking()
             .FirstOrDefaultAsync(ci => ci.Cartitemid == id);
     }
@@ -35,6 +37,8 @@ public class CartItemRepository : EntityRepository<Cartitem>, ICartItemRepositor
                 .ThenInclude(p => p.Category)
             .Include(c => c.Product)
                 .ThenInclude(p => p.Brand)
+            .Include(ci => ci.Product)
+                .ThenInclude(p => p.Productimages)
             .AsNoTracking()
             .OrderByDescending(ci => ci.Cartitemid);
 
@@ -50,6 +54,8 @@ public class CartItemRepository : EntityRepository<Cartitem>, ICartItemRepositor
                 .ThenInclude(p => p.Category)
             .Include(c => c.Product)
                 .ThenInclude(p => p.Brand)
+            .Include(ci => ci.Product)
+                .ThenInclude(p => p.Productimages)
             .AsNoTracking()
             .AsQueryable();
 
