@@ -14,6 +14,8 @@ public class UnitOfWork : IUnitOfWork
     
     // Strong-typed repositories backing fields
     private IProductRepository _productRepository;
+    private IProductImageRepository _productImageRepository;
+    private IProductReviewRepository _productReviewRepository;
     private ICategoryRepository _categoryRepository;
     private ICartRepository _cartRepository;
     private ICartItemRepository _cartItemRepository;
@@ -28,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     private IProductVoucherRepository _productVoucherRepository;
     private IUserVoucherRepository _userVoucherRepository;
     private IWishlistRepository _wishlistRepository;
+    private IUserDeviceTokenRepository _userDeviceTokenRepository;
 
     public UnitOfWork(SalesAppDBContext dbContext)
     {
@@ -48,6 +51,8 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IProductRepository ProductRepository => _productRepository ??= new ProductRepository(_dbContext);
+    public IProductImageRepository ProductImageRepository => _productImageRepository ??= new ProductImageRepository(_dbContext);
+    public IProductReviewRepository ProductReviewRepository => _productReviewRepository ??= new ProductReviewRepository(_dbContext);
     public ICategoryRepository CategoryRepository => _categoryRepository ??= new CategoryRepository(_dbContext);
     public ICartRepository CartRepository => _cartRepository ??= new CartRepository(_dbContext);
     public ICartItemRepository CartItemRepository => _cartItemRepository ??= new CartItemRepository(_dbContext);
@@ -62,6 +67,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductVoucherRepository ProductVoucherRepository => _productVoucherRepository ??= new ProductVoucherRepository(_dbContext);
     public IUserVoucherRepository UserVoucherRepository => _userVoucherRepository ??= new UserVoucherRepository(_dbContext);
     public IWishlistRepository WishlistRepository => _wishlistRepository ??= new WishlistRepository(_dbContext);
+    public IUserDeviceTokenRepository UserDeviceTokenRepository => _userDeviceTokenRepository ??= new UserDeviceTokenRepository(_dbContext);
 
     public Task<int> SaveChangesAsync()
     {

@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen();
 // Add Memory Cache
 builder.Services.AddMemoryCache();
 
+
 // Add Cloudinary
 var cloudinaryAccount = new Account(
     builder.Configuration["CloudinarySettings:CloudName"],
@@ -81,6 +82,9 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IUserDeviceTokenService, UserDeviceTokenService>();
+builder.Services.AddScoped<IFirebaseNotificationService, FirebaseNotificationService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW

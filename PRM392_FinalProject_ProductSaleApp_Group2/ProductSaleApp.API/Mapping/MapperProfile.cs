@@ -31,7 +31,8 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<PaymentRequest, PaymentBM>();
             CreateMap<PaymentGetRequest, PaymentBM>();
             CreateMap<UserRequest, UserBM>();
-            CreateMap<UserUpdateRequest, UserBM>();
+            CreateMap<UserUpdateRequest, UserBM>()
+                .ForMember(dest => dest.Username, opt => opt.Ignore()); // Không cho phép cập nhật Username
             CreateMap<UserGetRequest, UserBM>();
             CreateMap<NotificationRequest, NotificationBM>();
             CreateMap<NotificationGetRequest, NotificationBM>();
@@ -47,6 +48,11 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<WishlistRequest, WishlistBM>();
             CreateMap<WishlistGetRequest, WishlistBM>();
             CreateMap<CategoryGetRequest, CategoryBM>();
+            CreateMap<ProductImageRequest, ProductImageBM>();
+            CreateMap<ProductImageGetRequest, ProductImageBM>();
+            CreateMap<ProductReviewRequest, ProductReviewBM>();
+            CreateMap<ProductReviewGetRequest, ProductReviewBM>();
+            CreateMap<UserDeviceTokenRequest, UserDeviceTokenBM>();
 
             CreateMap<ProductBM, ProductResponse>();
             CreateMap<BrandBM, BrandResponse>();
@@ -63,6 +69,11 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductVoucherBM, ProductVoucherResponse>();
             CreateMap<UserVoucherBM, UserVoucherResponse>();
             CreateMap<WishlistBM, WishlistResponse>();
+            CreateMap<ProductImageBM, ProductImageResponse>();
+            CreateMap<ProductReviewBM, ProductReviewResponse>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
+                .ForMember(dest => dest.UserAvatarUrl, opt => opt.MapFrom(src => src.User != null ? src.User.Avatarurl : null));
+            CreateMap<UserDeviceTokenBM, UserDeviceTokenResponse>();
 
             CreateMap(typeof(PagedResult<>), typeof(PagedResponse<>));
         }

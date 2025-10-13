@@ -10,13 +10,66 @@ public class ServiceMappingProfile : Profile
     {
             // Auth BMs map to Repository models where needed are handled in service, not here
         CreateMap<Category, CategoryBM>().ReverseMap();
-        CreateMap<Product, ProductBM>().ReverseMap();
+        
+        // Product mapping - ignore navigation collections when mapping back
+        CreateMap<Product, ProductBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Cartitems, opt => opt.Ignore())
+            .ForMember(dest => dest.Productvouchers, opt => opt.Ignore())
+            .ForMember(dest => dest.Wishlists, opt => opt.Ignore())
+            .ForMember(dest => dest.Productimages, opt => opt.Ignore())
+            .ForMember(dest => dest.Productreviews, opt => opt.Ignore());
+        
         CreateMap<Brand, BrandBM>().ReverseMap();
         CreateMap<Cart, CartBM>().ReverseMap();
         CreateMap<Cartitem, CartItemBM>().ReverseMap();
-        CreateMap<Order, OrderBM>().ReverseMap();
-        CreateMap<Payment, PaymentBM>().ReverseMap();
-        CreateMap<User, UserBM>().ReverseMap();
+
+        // Order mapping: ensure DB snake_case <-> BM camelCase, UserId mapped
+        CreateMap<Order, OrderBM>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Orderid))
+            .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.Cartid))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.Paymentmethod))
+            .ForMember(dest => dest.BillingAddress, opt => opt.MapFrom(src => src.Billingaddress))
+            .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Orderstatus))
+            .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.Orderdate))
+            .ReverseMap()
+            .ForMember(dest => dest.Orderid, opt => opt.Ignore())
+            .ForMember(dest => dest.Cartid, opt => opt.MapFrom(src => src.CartId))
+            .ForMember(dest => dest.Userid, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Paymentmethod, opt => opt.MapFrom(src => src.PaymentMethod))
+            .ForMember(dest => dest.Billingaddress, opt => opt.MapFrom(src => src.BillingAddress))
+            .ForMember(dest => dest.Orderstatus, opt => opt.MapFrom(src => src.OrderStatus))
+            .ForMember(dest => dest.Orderdate, opt => opt.MapFrom(src => src.OrderDate))
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.Cart, opt => opt.Ignore())
+            .ForMember(dest => dest.Payments, opt => opt.Ignore())
+            .ForMember(dest => dest.Uservouchers, opt => opt.Ignore());
+
+        // Payment mapping: ensure OrderId maps to Orderid on save
+        CreateMap<Payment, PaymentBM>()
+            .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.Paymentid))
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Orderid))
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.Paymentstatus))
+            .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.Paymentdate))
+            .ReverseMap()
+            .ForMember(dest => dest.Paymentid, opt => opt.Ignore())
+            .ForMember(dest => dest.Orderid, opt => opt.MapFrom(src => src.OrderId))
+            .ForMember(dest => dest.Order, opt => opt.Ignore());
+        
+        // User mapping with explicit property mapping for case-sensitive fields
+        CreateMap<User, UserBM>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+            .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Passwordhash))
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Phonenumber))
+            .ForMember(dest => dest.Avatarurl, opt => opt.MapFrom(src => src.Avatarurl))
+            .ReverseMap()
+            .ForMember(dest => dest.Userid, opt => opt.Ignore()) // IGNORE primary key - cannot be modified
+            .ForMember(dest => dest.Passwordhash, opt => opt.MapFrom(src => src.PasswordHash))
+            .ForMember(dest => dest.Phonenumber, opt => opt.MapFrom(src => src.PhoneNumber))
+            .ForMember(dest => dest.Avatarurl, opt => opt.MapFrom(src => src.Avatarurl));
+        
         CreateMap<Notification, NotificationBM>().ReverseMap();
         CreateMap<Chatmessage, ChatMessageBM>().ReverseMap();
         CreateMap<Storelocation, StoreLocationBM>().ReverseMap();
@@ -24,6 +77,32 @@ public class ServiceMappingProfile : Profile
         CreateMap<Productvoucher, ProductVoucherBM>().ReverseMap();
         CreateMap<Uservoucher, UserVoucherBM>().ReverseMap();
         CreateMap<Wishlist, WishlistBM>().ReverseMap();
+        
+        // UserDeviceToken mapping
+        CreateMap<Userdevicetoken, UserDeviceTokenBM>()
+            .ForMember(dest => dest.TokenId, opt => opt.MapFrom(src => src.Tokenid))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+            .ForMember(dest => dest.FcmToken, opt => opt.MapFrom(src => src.Fcmtoken))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Isactive))
+            .ForMember(dest => dest.LastUpdatedDate, opt => opt.MapFrom(src => src.Lastupdateddate))
+            .ReverseMap()
+            .ForMember(dest => dest.Tokenid, opt => opt.Ignore())
+            .ForMember(dest => dest.Userid, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Fcmtoken, opt => opt.MapFrom(src => src.FcmToken))
+            .ForMember(dest => dest.Isactive, opt => opt.MapFrom(src => src.IsActive))
+            .ForMember(dest => dest.Lastupdateddate, opt => opt.MapFrom(src => src.LastUpdatedDate))
+            .ForMember(dest => dest.User, opt => opt.Ignore());
+        
+        // ProductImage mapping - ignore navigation property to avoid circular reference
+        CreateMap<Productimage, ProductImageBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Product, opt => opt.Ignore());
+        
+        // ProductReview mapping - include User but ignore Product navigation property
+        CreateMap<Productreview, ProductReviewBM>()
+            .ReverseMap()
+            .ForMember(dest => dest.Product, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore());
     }
 }
 
