@@ -95,6 +95,21 @@ public class ServiceMappingProfile : Profile
 
         CreateMap<Wishlist, WishlistBM>().ReverseMap();
         
+        // UserDeviceToken mapping
+        CreateMap<Userdevicetoken, UserDeviceTokenBM>()
+            .ForMember(dest => dest.TokenId, opt => opt.MapFrom(src => src.Tokenid))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+            .ForMember(dest => dest.FcmToken, opt => opt.MapFrom(src => src.Fcmtoken))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Isactive))
+            .ForMember(dest => dest.LastUpdatedDate, opt => opt.MapFrom(src => src.Lastupdateddate))
+            .ReverseMap()
+            .ForMember(dest => dest.Tokenid, opt => opt.Ignore())
+            .ForMember(dest => dest.Userid, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Fcmtoken, opt => opt.MapFrom(src => src.FcmToken))
+            .ForMember(dest => dest.Isactive, opt => opt.MapFrom(src => src.IsActive))
+            .ForMember(dest => dest.Lastupdateddate, opt => opt.MapFrom(src => src.LastUpdatedDate))
+            .ForMember(dest => dest.User, opt => opt.Ignore());
+        
         // ProductImage mapping - ignore navigation property to avoid circular reference
         CreateMap<Productimage, ProductImageBM>()
             .ReverseMap()
