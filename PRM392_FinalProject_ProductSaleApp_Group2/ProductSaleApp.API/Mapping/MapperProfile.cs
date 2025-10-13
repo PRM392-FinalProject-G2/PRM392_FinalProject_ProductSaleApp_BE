@@ -69,6 +69,7 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductVoucherBM, ProductVoucherResponse>();
             CreateMap<UserVoucherBM, UserVoucherResponse>();
             CreateMap<WishlistBM, WishlistResponse>();
+            CreateMap<WishlistMobileBM, WishlistMobileResponse>();
             CreateMap<ProductImageBM, ProductImageResponse>();
             CreateMap<ProductReviewBM, ProductReviewResponse>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
