@@ -7,6 +7,7 @@ public class OrderRequest
     public string PaymentMethod { get; set; }
     public string BillingAddress { get; set; }
     public string OrderStatus { get; set; }
+    public int? VoucherId { get; set; }
 }
 
 
