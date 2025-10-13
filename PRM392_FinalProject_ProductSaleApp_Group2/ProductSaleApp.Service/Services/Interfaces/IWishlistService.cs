@@ -5,6 +5,7 @@ namespace ProductSaleApp.Service.Services.Interfaces;
 public interface IWishlistService : ICrudService<WishlistBM>
 {
     Task<PagedResult<WishlistBM>> GetPagedFilteredAsync(WishlistBM filter, int pageNumber, int pageSize);
+    Task<PagedResult<WishlistMobileBM>> GetMobilePagedFilteredAsync(WishlistBM filter, int pageNumber, int pageSize);
 }
 
 
