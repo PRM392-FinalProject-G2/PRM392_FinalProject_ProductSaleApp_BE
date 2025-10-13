@@ -70,7 +70,8 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
 
         var total = await query.CountAsync();
         var items = await query
-            .OrderByDescending(p => p.Productid)
+            .OrderByDescending(p => p.Popularity) 
+            .ThenByDescending(p => p.Averagerating)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
