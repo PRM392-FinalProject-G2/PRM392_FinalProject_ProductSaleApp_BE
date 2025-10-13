@@ -52,6 +52,7 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductImageGetRequest, ProductImageBM>();
             CreateMap<ProductReviewRequest, ProductReviewBM>();
             CreateMap<ProductReviewGetRequest, ProductReviewBM>();
+            CreateMap<UserDeviceTokenRequest, UserDeviceTokenBM>();
 
             CreateMap<ProductBM, ProductResponse>();
             CreateMap<BrandBM, BrandResponse>();
@@ -72,6 +73,7 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<ProductReviewBM, ProductReviewResponse>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : null))
                 .ForMember(dest => dest.UserAvatarUrl, opt => opt.MapFrom(src => src.User != null ? src.User.Avatarurl : null));
+            CreateMap<UserDeviceTokenBM, UserDeviceTokenResponse>();
 
             CreateMap(typeof(PagedResult<>), typeof(PagedResponse<>));
         }
