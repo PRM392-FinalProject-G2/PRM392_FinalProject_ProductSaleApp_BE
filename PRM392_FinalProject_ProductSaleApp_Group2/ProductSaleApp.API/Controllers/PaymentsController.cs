@@ -6,6 +6,7 @@ using ProductSaleApp.Service.BusinessModel;
 using ProductSaleApp.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace ProductSaleApp.API.Controllers;
 
@@ -16,6 +17,7 @@ public class PaymentsController : ControllerBase
     private readonly IPaymentService _service;
     private readonly IMapper _mapper;
     private readonly IVnPayService _vnPayService;
+    private readonly IPaymentWorkflowService _paymentWorkflowService;
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
     private readonly IProductService _productService;
@@ -24,7 +26,7 @@ public class PaymentsController : ControllerBase
     private readonly IUserVoucherService _userVoucherService;
     private readonly IProductVoucherService _productVoucherService;
 
-    public PaymentsController(IPaymentService service, IMapper mapper, IVnPayService vnPayService, IOrderService orderService, ICartService cartService, IConfiguration configuration, IProductService productService, IVoucherService voucherService, IUserVoucherService userVoucherService, IProductVoucherService productVoucherService)
+    public PaymentsController(IPaymentService service, IMapper mapper, IVnPayService vnPayService, IOrderService orderService, ICartService cartService, IConfiguration configuration, IProductService productService, IVoucherService voucherService, IUserVoucherService userVoucherService, IProductVoucherService productVoucherService, IPaymentWorkflowService paymentWorkflowService)
     {
         _service = service;
         _mapper = mapper;
@@ -36,6 +38,7 @@ public class PaymentsController : ControllerBase
         _voucherService = voucherService;
         _userVoucherService = userVoucherService;
         _productVoucherService = productVoucherService;
+        _paymentWorkflowService = paymentWorkflowService;
     }
 
     [HttpGet("filter")]
@@ -65,123 +68,17 @@ public class PaymentsController : ControllerBase
     [HttpGet("vnpay/callback")]
     public async Task<ActionResult<object>> VnPayCallback()
     {
-        var ok = _vnPayService.ValidateCallback(Request.Query, out var status, out var txnRef, out var amount, out var message);
-        if (!ok)
-        {
-            return BadRequest(new { success = false, message = "Invalid signature" });
-        }
+        var result = await _paymentWorkflowService.ProcessVnPayCallbackAsync(Request.Query);
+        if (!result.Success && result.Message == "Invalid signature") return BadRequest(new { success = false, message = result.Message });
+        if (!result.Success && result.Message is "Invalid txn ref" or "Payment not found") return NotFound(new { success = false, message = result.Message });
 
-        if (!int.TryParse(txnRef, out var paymentId))
-        {
-            return BadRequest(new { success = false, message = "Invalid txn ref" });
-        }
-
-        var payment = await _service.GetByIdAsync(paymentId);
-        if (payment == null)
-        {
-            return NotFound(new { success = false, message = "Payment not found" });
-        }
-        var orderId = payment.OrderId ?? 0;
-        var order = orderId > 0 ? await _orderService.GetByIdAsync(orderId) : null;
-        
-        Console.WriteLine($"VnPayCallback: PaymentId={paymentId}, OrderId={orderId}, Status={status}");
-
-        if (status == "00")
-        {
-            payment.PaymentStatus = "Success";
-            if (order != null) order.OrderStatus = "Paid";
-
-            // Tăng popularity cho các product trong cart khi thanh toán thành công
-            if (order?.CartId.HasValue == true)
-            {
-                var cart = await _cartService.GetByIdAsync(order.CartId.Value);
-                if (cart?.CartItems?.Any() == true)
-                {
-                    var productIds = cart.CartItems
-                        .Where(ci => ci.ProductId.HasValue)
-                        .Select(ci => ci.ProductId.Value)
-                        .ToList();
-                    
-                    if (productIds.Any())
-                    {
-                        await _productService.IncrementPopularityAsync(productIds, 1);
-                        Console.WriteLine($"VnPayCallback: Increased popularity for {productIds.Count} products: [{string.Join(", ", productIds)}]");
-                    }
-                }
-            }
-
-            // Inline: mark voucher used for this order
-            if (order?.UserId.HasValue == true)
-            {
-                Console.WriteLine($"VnPayCallback: Looking for UserVoucher - UserId={order.UserId.Value}, OrderId={order.OrderId}");
-                
-                // Tìm UserVoucher cụ thể theo UserId và OrderId
-                var uv = await _userVoucherService.GetByUserIdAndOrderIdAsync(order.UserId.Value, order.OrderId);
-                
-                Console.WriteLine($"VnPayCallback: Found UserVoucher: {uv != null}");
-                if (uv != null)
-                {
-                    Console.WriteLine($"VnPayCallback: BEFORE UPDATE - IsUsed={uv.IsUsed}, UsedAt={uv.UsedAt}, UserVoucherId={uv.UserVoucherId}");
-                    
-                    // Chỉ update nếu chưa sử dụng
-                    if (!uv.IsUsed)
-                    {
-                        uv.IsUsed = true;
-                        uv.UsedAt = DateTime.Now;
-                        
-                        Console.WriteLine($"VnPayCallback: AFTER SET - IsUsed={uv.IsUsed}, UsedAt={uv.UsedAt}");
-                        
-                        var result = await _userVoucherService.UpdateAsync(uv.UserVoucherId, uv);
-                        
-                        Console.WriteLine($"VnPayCallback: UPDATE RESULT - IsUsed={result?.IsUsed}, UsedAt={result?.UsedAt}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"VnPayCallback: UserVoucher {uv.UserVoucherId} already used, skipping update");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"VnPayCallback: No UserVoucher found for OrderId={order.OrderId}");
-                }
-            }
-        }
-        else
-        {
-            payment.PaymentStatus = "Failed";
-            if (order != null) order.OrderStatus = "Failed";
-
-            // Inline: clear OrderId on failed payment so voucher remains reusable
-            if (order?.OrderId > 0)
-            {
-                var userVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM 
-                { 
-                    OrderId = order.OrderId,
-                    IsUsed = false
-                }, 1, 10);
-                var uv = userVouchers.Items.FirstOrDefault();
-                if (uv != null)
-                {
-                    uv.OrderId = null;
-                    await _userVoucherService.UpdateAsync(uv.UserVoucherId, uv);
-                }
-            }
-        }
-
-        await _service.UpdateAsync(payment.PaymentId, payment);
-        if (order != null)
-        {
-            await _orderService.UpdateAsync(order.OrderId, order);
-        }
-
-        var success = status == "00";
         var feUrl = _configuration["VnPay:FrontendReturnUrl"];
         if (!string.IsNullOrWhiteSpace(feUrl))
         {
-            var redirectUrl = feUrl + $"?orderId={orderId}&success={success.ToString().ToLower()}&amount={amount}";
+            var redirectUrl = feUrl + $"?orderId={result.OrderId}&success={result.Success.ToString().ToLower()}&amount={result.Amount}";
             return Redirect(redirectUrl);
         }
-        return Ok(new { success, orderId, amount, message });
+        return Ok(new { success = result.Success, orderId = result.OrderId, amount = result.Amount, message = result.Message });
     }
 
     [HttpPost("vnpay/create-order")]
@@ -216,53 +113,71 @@ public class PaymentsController : ControllerBase
         decimal voucherDiscount = 0m;
         if (request.VoucherId.HasValue)
         {
+			Console.WriteLine($"[Voucher] Start validate VoucherId={request.VoucherId.Value} for OrderId={order.OrderId}, UserId={request.UserId}");
             var voucher = await _voucherService.GetByIdAsync(request.VoucherId.Value);
             if (voucher == null) return BadRequest(new { message = "Voucher không tồn tại" });
             if (!voucher.IsActive) return BadRequest(new { message = "Voucher không còn hoạt động" });
             var now = DateTime.Now;
             if (now < voucher.StartDate || now > voucher.EndDate) return BadRequest(new { message = "Voucher không trong thời gian hiệu lực" });
+			Console.WriteLine($"[Voucher] Voucher active & valid period. Start={voucher.StartDate:O}, End={voucher.EndDate:O}, Percent={voucher.DiscountPercent}, Amount={voucher.DiscountAmount}");
 
             var userVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM { UserId = request.UserId.Value, VoucherId = request.VoucherId.Value }, 1, 10);
             var userVoucher = userVouchers.Items.FirstOrDefault();
             if (userVoucher == null) return BadRequest(new { message = "Bạn không sở hữu voucher này" });
             if (userVoucher.IsUsed) return BadRequest(new { message = "Voucher đã được sử dụng" });
+			Console.WriteLine($"[Voucher] UserVoucher found. IsUsed={userVoucher.IsUsed}, UserVoucherId={userVoucher.UserVoucherId}");
 
             var productVouchers = await _productVoucherService.GetPagedFilteredAsync(new ProductVoucherBM { VoucherId = request.VoucherId.Value }, 1, 1000);
             if (productVouchers.Items.Any())
             {
+				Console.WriteLine($"[Voucher] Product-specific voucher. ProductVoucher count={productVouchers.Items.Count}");
                 var cartProductIds = (await _cartService.GetByIdAsync(order.CartId.Value)).CartItems.Select(ci => ci.ProductId).Where(id => id.HasValue).Select(id => id.Value);
                 var voucherProductIds = productVouchers.Items.Select(pv => pv.ProductId);
                 var hasValidProduct = cartProductIds.Any(id => voucherProductIds.Contains(id));
                 if (!hasValidProduct) return BadRequest(new { message = "Voucher không áp dụng cho sản phẩm trong giỏ hàng" });
+				Console.WriteLine($"[Voucher] Matched products in cart: [{string.Join(", ", cartProductIds.Where(id => voucherProductIds.Contains(id)).Select(id => id.ToString()))}]");
 
                 if (voucher.DiscountPercent.HasValue)
                 {
                     var cartForVoucher = await _cartService.GetByIdAsync(order.CartId.Value);
                     var applicableItems = cartForVoucher.CartItems.Where(ci => ci.ProductId.HasValue && voucherProductIds.Contains(ci.ProductId.Value));
+					foreach (var item in applicableItems)
+					{
+						var lineTotal = item.Price * item.Quantity;
+						Console.WriteLine($"[Voucher] Item productId={item.ProductId}, price={item.Price}, qty={item.Quantity}, lineTotal={lineTotal}");
+					}
                     var applicableAmount = applicableItems.Sum(ci => ci.Price * ci.Quantity);
+					Console.WriteLine($"[Voucher] applicableAmount={applicableAmount}, percent={voucher.DiscountPercent.Value}");
                     voucherDiscount = applicableAmount * (voucher.DiscountPercent.Value / 100);
+					Console.WriteLine($"[Voucher] voucherDiscount (product-specific percent) = {voucherDiscount}");
                 }
                 else if (voucher.DiscountAmount.HasValue)
                 {
                     voucherDiscount = voucher.DiscountAmount.Value;
+					Console.WriteLine($"[Voucher] voucherDiscount (product-specific fixed amount) = {voucherDiscount}");
                 }
             }
             else
             {
+				Console.WriteLine($"[Voucher] Global voucher (no product restriction)");
                 var cartForVoucher = await _cartService.GetByIdAsync(order.CartId.Value);
                 var totalCartAmount = cartForVoucher.CartItems.Sum(ci => ci.Price * ci.Quantity);
+				Console.WriteLine($"[Voucher] totalCartAmount={totalCartAmount}");
                 if (voucher.DiscountPercent.HasValue)
                 {
                     voucherDiscount = totalCartAmount * (voucher.DiscountPercent.Value / 100);
+					Console.WriteLine($"[Voucher] voucherDiscount (global percent) = {voucherDiscount}");
                 }
                 else if (voucher.DiscountAmount.HasValue)
                 {
                     voucherDiscount = voucher.DiscountAmount.Value;
+					Console.WriteLine($"[Voucher] voucherDiscount (global fixed amount) = {voucherDiscount}");
                 }
             }
         }
 
         var finalAmount = amount - voucherDiscount;
+		Console.WriteLine($"[Voucher] amount(before)={amount}, voucherDiscount={voucherDiscount}, finalAmount={finalAmount}");
 
         var payment = await _service.CreateAsync(new PaymentBM
         {

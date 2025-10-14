@@ -87,6 +87,7 @@ builder.Services.AddScoped<IUserDeviceTokenService, UserDeviceTokenService>();
 builder.Services.AddScoped<IFirebaseNotificationService, FirebaseNotificationService>();
 builder.Services.AddScoped<IProductImageService, ProductImageService>();
 builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
+builder.Services.AddScoped<IPaymentWorkflowService, PaymentWorkflowService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW
