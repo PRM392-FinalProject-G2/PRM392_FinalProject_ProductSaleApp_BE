@@ -23,7 +23,7 @@ public class ProductsController : ControllerBase
     [HttpGet("filter")]
     public async Task<ActionResult<PagedResponse<ProductResponse>>> GetFilter([FromQuery] ProductGetRequest request)
     {
-        var filter = _mapper.Map<ProductBM>(request);
+        var filter = _mapper.Map<ProductFilterBM>(request);
         var paged = await _service.GetPagedFilteredAsync(filter, request.PageNumber, request.PageSize);
         return Ok(_mapper.Map<PagedResponse<ProductResponse>>(paged));
     }

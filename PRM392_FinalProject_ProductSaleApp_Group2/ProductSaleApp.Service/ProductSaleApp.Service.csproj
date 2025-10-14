@@ -9,10 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ProductSaleApp.Repository\ProductSaleApp.Repository.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BusinessModel\" />
-  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="FirebaseAdmin" Version="3.4.0" />
 		<PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
