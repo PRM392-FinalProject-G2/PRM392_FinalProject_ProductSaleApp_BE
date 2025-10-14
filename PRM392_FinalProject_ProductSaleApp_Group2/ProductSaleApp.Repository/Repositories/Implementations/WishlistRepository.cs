@@ -21,6 +21,12 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
     {
         return _dbContext.Wishlists
             .Include(w => w.Product)
+                .ThenInclude(p => p.Productimages)
+            .Include(w => w.Product)
+                .ThenInclude(p => p.Productreviews)
+                    .ThenInclude(pr => pr.User)
+            .Include(w => w.Product.Category)
+            .Include(w => w.Product.Brand)
             .Include(w => w.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(w => w.Wishlistid == id);
@@ -30,6 +36,12 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
     {
         var query = _dbContext.Wishlists
             .Include(w => w.Product)
+                .ThenInclude(p => p.Productimages)
+            .Include(w => w.Product)
+                .ThenInclude(p => p.Productreviews)
+                    .ThenInclude(pr => pr.User)
+            .Include(w => w.Product.Category)
+            .Include(w => w.Product.Brand)
             .Include(w => w.User)
             .AsNoTracking()
             .OrderByDescending(w => w.Createdat);
@@ -43,7 +55,40 @@ public class WishlistRepository : EntityRepository<Wishlist>, IWishlistRepositor
     {
         var query = _dbContext.Wishlists
             .Include(w => w.Product)
+                .ThenInclude(p => p.Productimages)
+            .Include(w => w.Product)
+                .ThenInclude(p => p.Productreviews)
+                    .ThenInclude(pr => pr.User)
+            .Include(w => w.Product.Category)
+            .Include(w => w.Product.Brand)
             .Include(w => w.User)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filter != null)
+        {
+            if (filter.Wishlistid > 0)
+                query = query.Where(w => w.Wishlistid == filter.Wishlistid);
+            if (filter.Userid > 0)
+                query = query.Where(w => w.Userid == filter.Userid);
+            if (filter.Productid > 0)
+                query = query.Where(w => w.Productid == filter.Productid);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(w => w.Createdat)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
+
+    public async Task<(IReadOnlyList<Wishlist> Items, int Total)> GetMobilePagedWithDetailsAsync(Wishlist filter, int pageNumber, int pageSize)
+    {
+        var query = _dbContext.Wishlists
+            .Include(w => w.Product)
+                .ThenInclude(p => p.Productimages.Where(pi => pi.Isprimary)) // Chỉ lấy primary image
             .AsNoTracking()
             .AsQueryable();
 

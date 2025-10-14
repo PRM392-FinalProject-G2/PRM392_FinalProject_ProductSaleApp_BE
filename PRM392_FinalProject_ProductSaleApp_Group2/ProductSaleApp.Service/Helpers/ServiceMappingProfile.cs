@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using ProductSaleApp.Repository.Models;
 using ProductSaleApp.Service.BusinessModel;
 
@@ -75,7 +75,24 @@ public class ServiceMappingProfile : Profile
         CreateMap<Storelocation, StoreLocationBM>().ReverseMap();
         CreateMap<Voucher, VoucherBM>().ReverseMap();
         CreateMap<Productvoucher, ProductVoucherBM>().ReverseMap();
-        CreateMap<Uservoucher, UserVoucherBM>().ReverseMap();
+        CreateMap<Uservoucher, UserVoucherBM>()
+     .ForMember(dest => dest.UserVoucherId, opt => opt.MapFrom(src => src.Uservoucherid))
+     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Userid))
+     .ForMember(dest => dest.VoucherId, opt => opt.MapFrom(src => src.Voucherid))
+     .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Orderid))
+     .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.Isused))
+     .ForMember(dest => dest.UsedAt, opt => opt.MapFrom(src => src.Usedat))
+     .ReverseMap()
+     .ForMember(dest => dest.Uservoucherid, opt => opt.Ignore()) 
+     .ForMember(dest => dest.Userid, opt => opt.MapFrom(src => src.UserId))
+     .ForMember(dest => dest.Voucherid, opt => opt.MapFrom(src => src.VoucherId))
+     .ForMember(dest => dest.Orderid, opt => opt.MapFrom(src => src.OrderId))
+     .ForMember(dest => dest.Isused, opt => opt.MapFrom(src => src.IsUsed))
+     .ForMember(dest => dest.Usedat, opt => opt.MapFrom(src => src.UsedAt))
+     .ForMember(dest => dest.User, opt => opt.Ignore())
+     .ForMember(dest => dest.Voucher, opt => opt.Ignore())
+     .ForMember(dest => dest.Order, opt => opt.Ignore());
+
         CreateMap<Wishlist, WishlistBM>().ReverseMap();
         
         // UserDeviceToken mapping

@@ -25,7 +25,8 @@ public class UserVoucherService : CrudService<Uservoucher, UserVoucherBM>, IUser
             Uservoucherid = filter?.UserVoucherId ?? 0,
             Userid = filter?.UserId ?? 0,
             Voucherid = filter?.VoucherId ?? 0,
-            Isused = filter?.IsUsed ?? false
+            Orderid = filter?.OrderId,
+            Isused = filter?.IsUsed ?? false  // Chỉ filter khi có giá trị cụ thể
         };
 
         var (entities, total) = await repo.GetPagedWithDetailsAsync(repositoryFilter, pageNumber, pageSize);
@@ -39,6 +40,13 @@ public class UserVoucherService : CrudService<Uservoucher, UserVoucherBM>, IUser
             TotalPages = totalPages,
             Items = items
         };
+    }
+
+    public async Task<UserVoucherBM> GetByUserIdAndOrderIdAsync(int userId, int orderId)
+    {
+        var repo = UnitOfWork.UserVoucherRepository;
+        var entity = await repo.GetByUserIdAndOrderIdAsync(userId, orderId);
+        return entity != null ? _mapper.Map<UserVoucherBM>(entity) : null;
     }
 }
 

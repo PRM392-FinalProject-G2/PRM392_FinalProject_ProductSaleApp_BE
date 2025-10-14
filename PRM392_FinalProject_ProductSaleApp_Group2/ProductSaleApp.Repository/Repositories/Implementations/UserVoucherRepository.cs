@@ -61,8 +61,9 @@ public class UserVoucherRepository : EntityRepository<Uservoucher>, IUserVoucher
                 query = query.Where(uv => uv.Userid == filter.Userid);
             if (filter.Voucherid > 0)
                 query = query.Where(uv => uv.Voucherid == filter.Voucherid);
-            if (filter.Isused)
-                query = query.Where(uv => uv.Isused);
+            if (filter.Orderid.HasValue && filter.Orderid.Value > 0)
+                query = query.Where(uv => uv.Orderid == filter.Orderid.Value);
+            // Không filter IsUsed ở đây vì đã có hàm riêng GetByUserIdAndOrderIdAsync
         }
 
         var total = await query.CountAsync();
@@ -72,6 +73,15 @@ public class UserVoucherRepository : EntityRepository<Uservoucher>, IUserVoucher
             .Take(pageSize)
             .ToListAsync();
         return (items, total);
+    }
+
+    public async Task<Uservoucher> GetByUserIdAndOrderIdAsync(int userId, int orderId)
+    {
+        return await _dbContext.Uservouchers
+            .Include(uv => uv.User)
+            .Include(uv => uv.Voucher)
+            .Include(uv => uv.Order)
+            .FirstOrDefaultAsync(uv => uv.Userid == userId && uv.Orderid == orderId);
     }
 }
 

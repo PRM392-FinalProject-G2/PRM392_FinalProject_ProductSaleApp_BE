@@ -28,6 +28,14 @@ public class WishlistsController : ControllerBase
         return Ok(_mapper.Map<PagedResponse<WishlistResponse>>(paged));
     }
 
+    [HttpGet("mobile")]
+    public async Task<ActionResult<PagedResponse<WishlistMobileResponse>>> GetMobileFilter([FromQuery] WishlistGetRequest request)
+    {
+        var filter = _mapper.Map<WishlistBM>(request);
+        var paged = await _service.GetMobilePagedFilteredAsync(filter, request.PageNumber, request.PageSize);
+        return Ok(_mapper.Map<PagedResponse<WishlistMobileResponse>>(paged));
+    }
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<WishlistResponse>> GetById(int id)
     {

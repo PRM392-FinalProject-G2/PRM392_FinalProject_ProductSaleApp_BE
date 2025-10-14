@@ -27,6 +27,9 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
             .Include(p => p.Cartitems)
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p.Brand)
+            .Include(c => c.Cartitems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Productimages)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Cartid == id);
     }
@@ -50,6 +53,12 @@ public class CartRepository : EntityRepository<Cart>, ICartRepository
             .Include(c => c.Cartitems)
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p.Category)
+            .Include(c => c.Cartitems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Brand)
+            .Include(c => c.Cartitems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.Productimages)
             .AsNoTracking()
             .AsQueryable();
 

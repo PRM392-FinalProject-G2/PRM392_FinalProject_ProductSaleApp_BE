@@ -85,6 +85,8 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IUserDeviceTokenService, UserDeviceTokenService>();
 builder.Services.AddScoped<IFirebaseNotificationService, FirebaseNotificationService>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
+builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
 
 // Repositories
 // Only UoW; repositories accessed via UoW
