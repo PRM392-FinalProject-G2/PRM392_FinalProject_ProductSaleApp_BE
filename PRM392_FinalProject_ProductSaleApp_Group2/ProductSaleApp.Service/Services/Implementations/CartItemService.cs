@@ -59,8 +59,72 @@ public class CartItemService : CrudService<Cartitem, CartItemBM>, ICartItemServi
         repo.Update(existing);
         await UnitOfWork.SaveChangesAsync();
 
+        // Update Cart TotalPrice
+        if (existing.Cartid.HasValue)
+        {
+            await UpdateCartTotalPriceAsync(existing.Cartid.Value);
+        }
+
         return _mapper.Map<CartItemBM>(existing);
     }
+
+    public async Task<CartItemBM> CreateCartItemAsync(CartItemBM model)
+    {
+        var result = await base.CreateAsync(model);
+        
+        // Update Cart TotalPrice
+        if (model.CartId.HasValue)
+        {
+            await UpdateCartTotalPriceAsync(model.CartId.Value);
+        }
+        
+        return result;
+    }
+
+    public async Task<bool> DeleteCartItemAsync(int id)
+    {
+        // Get CartId before deletion
+        var existing = await UnitOfWork.CartItemRepository.GetByIdAsync(id);
+        var cartId = existing?.Cartid;
+        
+        var result = await base.DeleteAsync(id);
+        
+        // Update Cart TotalPrice after deletion
+        if (result && cartId.HasValue)
+        {
+            await UpdateCartTotalPriceAsync(cartId.Value);
+        }
+        
+        return result;
+    }
+
+    private async Task UpdateCartTotalPriceAsync(int cartId)
+    {
+        try
+        {
+            // Get all CartItems for this Cart
+            var cartItems = await UnitOfWork.CartItemRepository.GetPagedWithDetailsAsync(
+                new Cartitem { Cartid = cartId }, 1, 1000);
+            
+            // Calculate total price
+            decimal totalPrice = cartItems.Items.Sum(item => item.Price * item.Quantity);
+            
+            // Update Cart TotalPrice
+            var cart = await UnitOfWork.CartRepository.GetByIdAsync(cartId);
+            if (cart != null)
+            {
+                cart.Totalprice = totalPrice;
+                UnitOfWork.CartRepository.Update(cart);
+                await UnitOfWork.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't throw to avoid breaking the main operation
+            Console.WriteLine($"Error updating cart total price: {ex.Message}");
+        }
+    }
+
 
 }
 
