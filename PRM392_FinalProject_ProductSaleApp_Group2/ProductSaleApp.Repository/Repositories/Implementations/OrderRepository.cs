@@ -25,6 +25,14 @@ public class OrderRepository : EntityRepository<Order>, IOrderRepository
                 .ThenInclude(c => c.Cartitems)
                     .ThenInclude(ci => ci.Product)
                         .ThenInclude(p => p.Category)
+            .Include(o => o.Cart)
+                .ThenInclude(c => c.Cartitems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Productimages)
+            .Include(o => o.Cart)
+                .ThenInclude(c => c.Cartitems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Brand)
             .Include(o => o.Payments)
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Orderid == id);
@@ -63,6 +71,10 @@ public class OrderRepository : EntityRepository<Order>, IOrderRepository
 
         var total = await query.CountAsync();
         var items = await query
+            .Include(o => o.Cart)
+                .ThenInclude(c => c.Cartitems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Productimages)
             .OrderByDescending(o => o.Orderdate)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
