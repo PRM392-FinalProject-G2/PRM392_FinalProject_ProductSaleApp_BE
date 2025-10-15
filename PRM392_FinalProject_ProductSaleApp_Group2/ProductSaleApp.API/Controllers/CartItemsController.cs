@@ -50,7 +50,7 @@ public class CartItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<CartItemResponse>> Create(CartItemRequest request)
     {
-        var created = await _service.CreateAsync(_mapper.Map<CartItemBM>(request));
+        var created = await _service.CreateCartItemAsync(_mapper.Map<CartItemBM>(request));
         var response = _mapper.Map<CartItemResponse>(created);
         
         // Send notification after adding item to cart
@@ -78,7 +78,7 @@ public class CartItemsController : ControllerBase
         var item = await _service.GetByIdAsync(id, includeDetails: false);
         int? cartId = item?.CartId;
         
-        var ok = await _service.DeleteAsync(id);
+        var ok = await _service.DeleteCartItemAsync(id);
         if (!ok) return NotFound();
         
         // Send notification after deleting cart item
@@ -109,6 +109,7 @@ public class CartItemsController : ControllerBase
             _logger.LogError(ex, $"Failed to send cart update notification for cart {cartId}");
         }
     }
+
 }
 
 
