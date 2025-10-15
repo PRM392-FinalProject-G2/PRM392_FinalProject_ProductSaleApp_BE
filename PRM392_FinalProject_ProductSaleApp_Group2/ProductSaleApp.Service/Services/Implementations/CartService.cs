@@ -42,6 +42,28 @@ public class CartService : CrudService<Cart, CartBM>, ICartService
             Items = items
         };
     }
+
+    public async Task<bool> UpdateCartStatusAsync(int cartId, string status)
+    {
+        try
+        {
+            var repo = UnitOfWork.CartRepository;
+            var cart = await repo.GetByIdAsync(cartId, trackChanges: true);
+            
+            if (cart == null)
+                return false;
+
+            cart.Status = status;
+            repo.Update(cart);
+            await UnitOfWork.SaveChangesAsync();
+            
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 }
 
 
