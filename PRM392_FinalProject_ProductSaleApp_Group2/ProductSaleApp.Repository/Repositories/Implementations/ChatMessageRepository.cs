@@ -31,8 +31,7 @@ public class ChatMessageRepository : EntityRepository<Chatmessage>, IChatMessage
         var query = _dbContext.Chatmessages
             .Include(cm => cm.Sender)
             .Include(cm => cm.Receiver)
-            .AsNoTracking()
-            .OrderByDescending(cm => cm.Sentat);
+            .AsNoTracking();
 
         var total = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -59,7 +58,6 @@ public class ChatMessageRepository : EntityRepository<Chatmessage>, IChatMessage
 
         var total = await query.CountAsync();
         var items = await query
-            .OrderByDescending(cm => cm.Sentat)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
