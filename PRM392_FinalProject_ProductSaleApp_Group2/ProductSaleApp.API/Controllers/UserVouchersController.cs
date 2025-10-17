@@ -44,6 +44,14 @@ public class UserVouchersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = response.UserVoucherId }, response);
     }
 
+    [HttpGet("user/{userId:int}/active-valid")]
+    public async Task<ActionResult<IReadOnlyList<UserVoucherResponse>>> GetActiveValidByUser(int userId)
+    {
+        var items = await _service.GetActiveUnexpiredByUserIdAsync(userId);
+        var responses = _mapper.Map<IReadOnlyList<UserVoucherResponse>>(items);
+        return Ok(responses);
+    }
+
     [HttpPut("{id:int}")]
     public async Task<ActionResult<UserVoucherResponse>> Update(int id, UserVoucherRequest request)
     {

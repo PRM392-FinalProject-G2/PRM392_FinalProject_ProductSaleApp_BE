@@ -18,6 +18,7 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 	private readonly IVoucherService _voucherService;
 	private readonly IProductVoucherService _productVoucherService;
 	private readonly ProductSaleApp.Repository.UnitOfWork.IUnitOfWork _unitOfWork;
+    // Helper: delete payment by id using payment service
 
 	public PaymentWorkflowService(
 		IVnPayService vnPayService,
@@ -41,6 +42,151 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 		_unitOfWork = unitOfWork;
 	}
 
+	private async Task _serviceDeletePaymentIfPossible(int paymentId)
+	{
+		try
+		{
+			await _paymentService.DeleteAsync(paymentId);
+		}
+		catch { /* ignore delete failures */ }
+	}
+
+	public async Task<AmountCalculationResult> CalculateOrderAmountAsync(int cartId, int? userId, int? voucherId)
+	{
+		try
+		{
+			var cart = await _cartService.GetByIdAsync(cartId);
+			if (cart == null)
+			{
+				return new AmountCalculationResult { Success = false, Message = "Cart not found" };
+			}
+
+			decimal amount = 0m;
+			if (cart.CartItems != null && cart.CartItems.Count > 0)
+			{
+				amount = cart.CartItems.Sum(ci => ci.Price * ci.Quantity);
+			}
+			else
+			{
+				amount = cart.TotalPrice;
+			}
+
+			decimal voucherDiscount = 0m;
+			if (voucherId.HasValue)
+			{
+				if (!userId.HasValue)
+					return new AmountCalculationResult { Success = false, Message = "UserId is required when applying voucher" };
+
+				var voucher = await _voucherService.GetByIdAsync(voucherId.Value);
+				if (voucher == null)
+					return new AmountCalculationResult { Success = false, Message = "Voucher không tồn tại" };
+				if (!voucher.IsActive)
+					return new AmountCalculationResult { Success = false, Message = "Voucher không còn hoạt động" };
+				var now = DateTime.Now;
+				if (now < voucher.StartDate || now > voucher.EndDate)
+					return new AmountCalculationResult { Success = false, Message = "Voucher không trong thời gian hiệu lực" };
+
+				var userVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM
+				{
+					UserId = userId.Value,
+					VoucherId = voucherId.Value
+				}, 1, 10);
+				var userVoucher = userVouchers.Items.FirstOrDefault();
+				if (userVoucher == null)
+					return new AmountCalculationResult { Success = false, Message = "Bạn không sở hữu voucher này" };
+				if (userVoucher.IsUsed)
+					return new AmountCalculationResult { Success = false, Message = "Voucher đã được sử dụng" };
+
+				var productVouchers = await _productVoucherService.GetPagedFilteredAsync(new ProductVoucherBM { VoucherId = voucherId.Value }, 1, 1000);
+				if (productVouchers.Items.Any())
+				{
+					var cartProductIds = cart.CartItems.Select(ci => ci.ProductId).Where(id => id.HasValue).Select(id => id.Value);
+					var voucherProductIds = productVouchers.Items.Select(pv => pv.ProductId);
+					var hasValidProduct = cartProductIds.Any(id => voucherProductIds.Contains(id));
+					if (!hasValidProduct)
+						return new AmountCalculationResult { Success = false, Message = "Voucher không áp dụng cho sản phẩm trong giỏ hàng" };
+
+					if (voucher.DiscountPercent.HasValue)
+					{
+						var applicableItems = cart.CartItems.Where(ci => ci.ProductId.HasValue && voucherProductIds.Contains(ci.ProductId.Value));
+						var applicableAmount = applicableItems.Sum(ci => ci.Price * ci.Quantity);
+						voucherDiscount = applicableAmount * (voucher.DiscountPercent.Value / 100);
+					}
+					else if (voucher.DiscountAmount.HasValue)
+					{
+						voucherDiscount = voucher.DiscountAmount.Value;
+					}
+				}
+				else
+				{
+					var totalCartAmount = cart.CartItems.Sum(ci => ci.Price * ci.Quantity);
+					if (voucher.DiscountPercent.HasValue)
+						voucherDiscount = totalCartAmount * (voucher.DiscountPercent.Value / 100);
+					else if (voucher.DiscountAmount.HasValue)
+						voucherDiscount = voucher.DiscountAmount.Value;
+				}
+			}
+
+			var finalAmount = amount - voucherDiscount;
+			return new AmountCalculationResult
+			{
+				Success = true,
+				OriginalAmount = amount,
+				VoucherDiscount = voucherDiscount,
+				FinalAmount = finalAmount
+			};
+		}
+		catch (Exception ex)
+		{
+			return new AmountCalculationResult { Success = false, Message = ex.Message };
+		}
+	}
+
+	public async Task<CreateOrderPaymentResult> CreatePaymentWithFinalAmountAsync(OrderBM orderRequest, int? voucherId, decimal finalAmount, string clientIp)
+	{
+		try
+		{
+			if (!orderRequest.CartId.HasValue)
+				return new CreateOrderPaymentResult { Success = false, Message = "CartId is required" };
+
+			// Step now: DO NOT create order yet. Create a pending payment first to obtain paymentId (vnp_TxnRef)
+			var payment = await _paymentService.CreateAsync(new PaymentBM
+			{
+				OrderId = null,
+				Amount = finalAmount,
+				PaymentStatus = "Pending",
+				PaymentDate = DateTime.Now
+			});
+
+			// Embed order metadata so callback can create order if success
+			var meta = new
+			{
+				cartId = orderRequest.CartId,
+				userId = orderRequest.UserId,
+				voucherId = voucherId,
+				finalAmount = finalAmount,
+				paymentMethod = orderRequest.PaymentMethod,
+				billingAddress = orderRequest.BillingAddress
+			};
+			var orderInfo = System.Text.Json.JsonSerializer.Serialize(meta);
+
+			var url = _vnPayService.CreatePaymentUrl(payment.PaymentId, 0, finalAmount, clientIp, orderInfo);
+			return new CreateOrderPaymentResult
+			{
+				Success = true,
+				OrderId = 0,
+				PaymentId = payment.PaymentId,
+				OriginalAmount = finalAmount,
+				VoucherDiscount = 0,
+				FinalAmount = finalAmount,
+				PaymentUrl = url
+			};
+		}
+		catch (Exception ex)
+		{
+			return new CreateOrderPaymentResult { Success = false, Message = ex.Message };
+		}
+	}
 	public async Task<VnPayCallbackResult> ProcessVnPayCallbackAsync(IQueryCollection query)
 	{
 		var ok = _vnPayService.ValidateCallback(query, out var status, out var txnRef, out var amount, out var message);
@@ -66,7 +212,50 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 		if (status == "00")
 		{
 			payment.PaymentStatus = "Paid";
-			if (order != null) order.OrderStatus = "Delivering";
+
+			// If order hasn't been created yet (new flow), create it now from vnp_OrderInfo
+			if (order == null)
+			{
+				var orderInfoJson = query["vnp_OrderInfo"].ToString();
+				try
+				{
+					var meta = System.Text.Json.JsonSerializer.Deserialize<OrderInfoMeta>(orderInfoJson);
+					var newOrder = new OrderBM
+					{
+						CartId = meta?.cartId,
+						UserId = meta?.userId,
+						OrderStatus = "Pending",
+						OrderDate = DateTime.Now,
+						PaymentMethod = meta?.paymentMethod,
+						BillingAddress = meta?.billingAddress
+					};
+					var created = await _orderService.CreateAsync(newOrder);
+					order = await _orderService.GetByIdAsync(created.OrderId);
+					orderId = order.OrderId;
+					payment.OrderId = orderId;
+					payment.Amount = meta?.finalAmount ?? amount;
+
+					// Link voucher for later marking used
+					if (meta?.voucherId != null && meta?.userId != null)
+					{
+						var linkUserVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM
+						{
+							UserId = meta.userId.Value,
+							VoucherId = meta.voucherId.Value,
+							IsUsed = false
+						}, 1, 10);
+						var uv = linkUserVouchers.Items.FirstOrDefault();
+						if (uv != null)
+						{
+							uv.OrderId = orderId;
+							await _userVoucherService.UpdateAsync(uv.UserVoucherId, uv);
+						}
+					}
+				}
+				catch { /* ignore malformed metadata */ }
+			}
+
+			if (order != null) order.OrderStatus = "Pending";
 
 			if (order?.CartId.HasValue == true)
 			{
@@ -100,26 +289,50 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 			// Handle cart management after successful payment
 			if (order != null)
 			{
-				await HandleSuccessfulPaymentCartManagementAsync(order.OrderId);
+				// Use finalAmount from metadata if available, otherwise use payment.Amount
+				var finalAmount = payment.Amount;
+				if (orderId > 0 && order.OrderId == orderId)
+				{
+					// This is a new order created from metadata, use the finalAmount from metadata
+					var orderInfoJson = query["vnp_OrderInfo"].ToString();
+					try
+					{
+						var meta = System.Text.Json.JsonSerializer.Deserialize<OrderInfoMeta>(orderInfoJson);
+						if (meta?.finalAmount.HasValue == true)
+						{
+							finalAmount = meta.finalAmount.Value;
+						}
+					}
+					catch { /* ignore malformed metadata */ }
+				}
+				
+				await HandleSuccessfulPaymentCartManagementAsync(order.OrderId, finalAmount);
 			}
 		}
 		else
 		{
+			// New flow: on fail, do not create order; if there's a pending payment without order, delete it
 			payment.PaymentStatus = "Failed";
-			if (order != null) order.OrderStatus = "Failed";
-
-			if (order?.OrderId > 0)
+			if (payment.OrderId == null || payment.OrderId == 0)
 			{
-				var userVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM
+				await _serviceDeletePaymentIfPossible(payment.PaymentId);
+			}
+			else
+			{
+				if (order != null) order.OrderStatus = "Failed";
+				if (order?.OrderId > 0)
 				{
-					OrderId = order.OrderId,
-					IsUsed = false
-				}, 1, 10);
-				var uv = userVouchers.Items.FirstOrDefault();
-				if (uv != null)
-				{
-					uv.OrderId = null;
-					await _userVoucherService.UpdateAsync(uv.UserVoucherId, uv);
+					var userVouchers = await _userVoucherService.GetPagedFilteredAsync(new UserVoucherBM
+					{
+						OrderId = order.OrderId,
+						IsUsed = false
+					}, 1, 10);
+					var uv = userVouchers.Items.FirstOrDefault();
+					if (uv != null)
+					{
+						uv.OrderId = null;
+						await _userVoucherService.UpdateAsync(uv.UserVoucherId, uv);
+					}
 				}
 			}
 		}
@@ -256,6 +469,7 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 
 			// NOW create order after all validations pass
 			orderRequest.OrderStatus = "Pending";
+			orderRequest.OrderDate = DateTime.Now;
 			var createdOrder = await _orderService.CreateAsync(orderRequest);
 			var order = await _orderService.GetByIdAsync(createdOrder.OrderId);
 
@@ -306,7 +520,7 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 		}
 	}
 
-	public async Task<bool> HandleSuccessfulPaymentCartManagementAsync(int orderId)
+	public async Task<bool> HandleSuccessfulPaymentCartManagementAsync(int orderId, decimal finalAmount)
 	{
 		try
 		{
@@ -332,11 +546,19 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 			var createdCart = await _cartService.CreateAsync(newCart);
 			Console.WriteLine($"[CartManagement] Created new cart {createdCart.CartId} with status Active for user {userId}");
 
-			// Update the old cart status to Completed using dedicated method to avoid tracking conflicts
+			// Update the old cart status to Completed and set its TotalPrice to final amount
 			var updateResult = await _cartService.UpdateCartStatusAsync(cartId, "Completed");
 			if (updateResult)
 			{
-				Console.WriteLine($"[CartManagement] Updated cart {cartId} status to Completed");
+				// Update TotalPrice using the same approach as UpdateCartStatusAsync
+				var cart = await _unitOfWork.CartRepository.GetByIdAsync(cartId, trackChanges: true);
+				if (cart != null)
+				{
+					cart.Totalprice = finalAmount;
+					_unitOfWork.CartRepository.Update(cart);
+					await _unitOfWork.SaveChangesAsync();
+					Console.WriteLine($"[CartManagement] Updated cart {cartId} status to Completed with totalPrice={finalAmount}");
+				}
 			}
 			else
 			{
@@ -351,6 +573,16 @@ public class PaymentWorkflowService : IPaymentWorkflowService
 			return false;
 		}
 	}
+}
+
+internal class OrderInfoMeta
+{
+    public int? cartId { get; set; }
+    public int? userId { get; set; }
+    public int? voucherId { get; set; }
+    public decimal? finalAmount { get; set; }
+    public string paymentMethod { get; set; }
+    public string billingAddress { get; set; }
 }
 
 

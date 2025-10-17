@@ -37,6 +37,8 @@ public class UnitOfWork : IUnitOfWork
         _dbContext = dbContext;
     }
 
+    public SalesAppDBContext DbContext => _dbContext;
+
     public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class
     {
         var type = typeof(TEntity);

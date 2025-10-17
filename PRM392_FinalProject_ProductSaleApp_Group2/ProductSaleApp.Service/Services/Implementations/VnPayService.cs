@@ -31,7 +31,7 @@ public class VnPayService : IVnPayService
         };
     }
 
-    public string CreatePaymentUrl(int paymentId, int orderId, decimal amount, string clientIp)
+    public string CreatePaymentUrl(int paymentId, int orderId, decimal amount, string clientIp, string orderInfo = null)
     {
         var vnpParams = new SortedDictionary<string, string>
         {
@@ -41,7 +41,7 @@ public class VnPayService : IVnPayService
             ["vnp_Amount"] = ((long)(amount * 100)).ToString(CultureInfo.InvariantCulture),
             ["vnp_CurrCode"] = _settings.CurrCode,
             ["vnp_TxnRef"] = paymentId.ToString(),
-            ["vnp_OrderInfo"] = $"Thanh toan don hang #{orderId}",
+            ["vnp_OrderInfo"] = string.IsNullOrWhiteSpace(orderInfo) ? $"Thanh toan don hang #{orderId}" : orderInfo,
             ["vnp_OrderType"] = "other",
             ["vnp_Locale"] = _settings.Locale,
             ["vnp_ReturnUrl"] = _settings.ReturnUrl,
