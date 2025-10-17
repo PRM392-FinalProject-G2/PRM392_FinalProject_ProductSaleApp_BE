@@ -71,7 +71,23 @@ public class ServiceMappingProfile : Profile
             .ForMember(dest => dest.Avatarurl, opt => opt.MapFrom(src => src.Avatarurl));
         
         CreateMap<Notification, NotificationBM>().ReverseMap();
-        CreateMap<Chatmessage, ChatMessageBM>().ReverseMap();
+        
+        // ChatMessage mapping with explicit property mapping for case-sensitive fields
+        CreateMap<Chatmessage, ChatMessageBM>()
+            .ForMember(dest => dest.ChatMessageId, opt => opt.MapFrom(src => src.Chatmessageid))
+            .ForMember(dest => dest.SenderId, opt => opt.MapFrom(src => src.Senderid))
+            .ForMember(dest => dest.ReceiverId, opt => opt.MapFrom(src => src.Receiverid))
+            .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message))
+            .ForMember(dest => dest.SentAt, opt => opt.MapFrom(src => src.Sentat))
+            .ReverseMap()
+            .ForMember(dest => dest.Chatmessageid, opt => opt.Ignore()) // IGNORE primary key
+            .ForMember(dest => dest.Senderid, opt => opt.MapFrom(src => src.SenderId))
+            .ForMember(dest => dest.Receiverid, opt => opt.MapFrom(src => src.ReceiverId))
+            .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message))
+            .ForMember(dest => dest.Sentat, opt => opt.MapFrom(src => src.SentAt))
+            .ForMember(dest => dest.Sender, opt => opt.Ignore()) // Ignore navigation properties
+            .ForMember(dest => dest.Receiver, opt => opt.Ignore());
+        
         CreateMap<Storelocation, StoreLocationBM>().ReverseMap();
         CreateMap<Voucher, VoucherBM>().ReverseMap();
         CreateMap<Productvoucher, ProductVoucherBM>().ReverseMap();
