@@ -1,11 +1,14 @@
 using System;
 using System.Threading.Tasks;
+using ProductSaleApp.Repository.DBContext;
 using ProductSaleApp.Repository.Repositories.Interfaces;
 
 namespace ProductSaleApp.Repository.UnitOfWork;
 
 public interface IUnitOfWork : IDisposable
 {
+    SalesAppDBContext DbContext { get; }
+    
     IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class;
 
     // Strong-typed repositories

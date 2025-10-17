@@ -64,25 +64,43 @@ public class PaymentsController : ControllerBase
         return Ok(new { success = result.Success, orderId = result.OrderId, amount = result.Amount, message = result.Message });
     }
 
-    [HttpPost("vnpay/create-order")]
-    public async Task<ActionResult<object>> CreateOrderAndVnPayUrl(OrderRequest request)
+    
+
+    // Step 1: Tính tiền + validate voucher, không tạo order/payment
+    [HttpPost("vnpay/calculate-amount")]
+    public async Task<ActionResult<object>> CalculateAmount(PaymentCalculateRequest request)
     {
-        var orderModel = _mapper.Map<OrderBM>(request);
-        orderModel.UserId = request.UserId; // đảm bảo gán đúng UserId
-        
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-        var result = await _paymentWorkflowService.CreateOrderAndPaymentAsync(orderModel, request.VoucherId, clientIp);
-        
+        if (!request.CartId.HasValue)
+            return BadRequest(new { message = "CartId is required" });
+
+        var result = await _paymentWorkflowService.CalculateOrderAmountAsync(request.CartId.Value, request.UserId, request.VoucherId);
         if (!result.Success)
-        {
             return BadRequest(new { message = result.Message });
-        }
-        
+
+        return Ok(new { originalAmount = result.OriginalAmount, voucherDiscount = result.VoucherDiscount, finalAmount = result.FinalAmount });
+    }
+
+    // Step 2: Tạo order + payment từ finalAmount đã tính trước
+    [HttpPost("vnpay/create-payment")]
+    public async Task<ActionResult<object>> CreatePaymentFromFinal(PaymentCreateFinalRequest request)
+    {
+        var orderModel = new OrderBM
+        {
+            CartId = request.CartId,
+            UserId = request.UserId,
+            OrderStatus = "Pending",
+            PaymentMethod = request.PaymentMethod,
+            BillingAddress = request.BillingAddress
+        };
+
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+        var result = await _paymentWorkflowService.CreatePaymentWithFinalAmountAsync(orderModel, request.VoucherId, request.FinalAmount, clientIp);
+
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
+
         return Ok(new { 
-            orderId = result.OrderId, 
             paymentId = result.PaymentId, 
-            originalAmount = result.OriginalAmount, 
-            voucherDiscount = result.VoucherDiscount, 
             finalAmount = result.FinalAmount, 
             paymentUrl = result.PaymentUrl 
         });

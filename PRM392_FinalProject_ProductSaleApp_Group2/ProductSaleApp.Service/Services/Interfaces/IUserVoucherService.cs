@@ -6,6 +6,7 @@ public interface IUserVoucherService : ICrudService<UserVoucherBM>
 {
     Task<PagedResult<UserVoucherBM>> GetPagedFilteredAsync(UserVoucherBM filter, int pageNumber, int pageSize);
     Task<UserVoucherBM> GetByUserIdAndOrderIdAsync(int userId, int orderId);
+    Task<IReadOnlyList<UserVoucherBM>> GetActiveUnexpiredByUserIdAsync(int userId);
 }
 
 
