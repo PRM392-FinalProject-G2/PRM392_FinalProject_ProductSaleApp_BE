@@ -51,8 +51,6 @@ public class ProductRepository : EntityRepository<Product>, IProductRepository
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Include(p => p.Productimages)
-            .Include(p => p.Productreviews)
-                .ThenInclude(pr => pr.User)
             .AsNoTracking()
             .AsQueryable();
 

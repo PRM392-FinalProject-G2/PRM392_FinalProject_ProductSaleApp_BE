@@ -77,6 +77,8 @@ namespace ProductSaleApp.API.Mapping
             CreateMap<UserDeviceTokenBM, UserDeviceTokenResponse>();
 
             CreateMap(typeof(PagedResult<>), typeof(PagedResponse<>));
+            CreateMap<ProductGetRequest, ProductFilterBM>();
+
         }
     }
 }
