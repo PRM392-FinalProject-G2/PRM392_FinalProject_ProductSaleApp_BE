@@ -15,7 +15,8 @@ DROP TABLE IF EXISTS
     Products,
     Brands,
     Categories,
-    Users
+    Users,
+	UserDeviceTokens
 CASCADE;
 
 /* ================================
@@ -238,6 +239,14 @@ CREATE TABLE ProductVouchers (
     FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
     CONSTRAINT UQ_ProductVoucher UNIQUE(VoucherID, ProductID)
 );
+CREATE TABLE UserDeviceTokens (
+    TokenID SERIAL PRIMARY KEY,
+    UserID INT NOT NULL,
+    FCMToken VARCHAR(500) NOT NULL,
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    LastUpdatedDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
 
 /* ================================
    Insert StoreLocations
@@ -426,6 +435,7 @@ VALUES
 (4, 52990000, 'Completed'),
 (5, 11990000, 'Completed'),
 (6, 8990000, 'Active'),
+(3, 0, 'Active'),
 (2, 19990000, 'Completed');
 
 /* ================================
@@ -527,16 +537,16 @@ VALUES
 ================================ */
 INSERT INTO Vouchers (Code, Description, DiscountPercent, DiscountAmount, StartDate, EndDate, IsActive)
 VALUES
-('SALE10', 'Giảm 10% cho tất cả sản phẩm', 10.00, NULL, '2025-01-01', '2025-12-31', TRUE),
-('WELCOME50K', 'Giảm 50k cho khách hàng mới', NULL, 50000, '2025-01-01', '2025-12-31', TRUE),
-('FLASH100K', 'Flash sale giảm 100k', NULL, 100000, '2025-10-01', '2025-10-15', TRUE),
-('LAPTOP15', 'Giảm 15% cho laptop', 15.00, NULL, '2025-01-01', '2025-06-30', TRUE),
-('PHONE20', 'Giảm 20% cho điện thoại', 20.00, NULL, '2025-03-01', '2025-03-31', FALSE),
-('NEWYEAR200K', 'Tết giảm 200k', NULL, 200000, '2025-01-20', '2025-02-10', TRUE),
-('SUMMER25', 'Hè giảm 25%', 25.00, NULL, '2025-06-01', '2025-08-31', TRUE),
-('BLACKFRIDAY30', 'Black Friday giảm 30%', 30.00, NULL, '2025-11-25', '2025-11-30', TRUE),
-('FREESHIP', 'Miễn phí vận chuyển', NULL, 30000, '2025-01-01', '2025-12-31', TRUE),
-('VIP500K', 'Giảm 500k cho VIP', NULL, 500000, '2025-01-01', '2025-12-31', TRUE);
+('SALE10', 'Giảm 10% cho tất cả sản phẩm', 10.00, NULL, '2025-01-01', '2026-12-31', TRUE),
+('WELCOME50K', 'Giảm 50k cho khách hàng mới', NULL, 50000, '2025-01-01', '2026-12-31', TRUE),
+('FLASH100K', 'Flash sale giảm 100k', NULL, 100000, '2025-10-01', '2026-10-15', TRUE),
+('LAPTOP15', 'Giảm 15% cho laptop', 15.00, NULL, '2025-01-01', '2026-06-30', TRUE),
+('PHONE20', 'Giảm 20% cho điện thoại', 20.00, NULL, '2025-03-01', '2026-03-31', FALSE),
+('NEWYEAR200K', 'Tết giảm 200k', NULL, 200000, '2025-01-20', '2026-02-10', TRUE),
+('SUMMER25', 'Hè giảm 25%', 25.00, NULL, '2025-06-01', '2026-08-31', TRUE),
+('BLACKFRIDAY30', 'Black Friday giảm 30%', 30.00, NULL, '2026-11-25', '2026-11-30', TRUE),
+('FREESHIP', 'Miễn phí vận chuyển', NULL, 30000, '2025-01-01', '2026-12-31', TRUE),
+('VIP500K', 'Giảm 500k cho VIP', NULL, 500000, '2025-01-01', '2026-12-31', TRUE);
 
 /* ================================
    Insert ProductVouchers
