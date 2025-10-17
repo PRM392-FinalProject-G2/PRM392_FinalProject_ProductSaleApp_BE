@@ -35,6 +35,9 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddDbContext<SalesAppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -73,6 +76,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
+builder.Services.AddScoped<IChatRealtimeService, ChatRealtimeService>();
 builder.Services.AddScoped<IStoreLocationService, StoreLocationService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
@@ -84,7 +88,6 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IUserDeviceTokenService, UserDeviceTokenService>();
-builder.Services.AddScoped<IFirebaseNotificationService, FirebaseNotificationService>();
 builder.Services.AddScoped<IProductImageService, ProductImageService>();
 builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
 builder.Services.AddScoped<IPaymentWorkflowService, PaymentWorkflowService>();
@@ -103,5 +106,8 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map SignalR Hub
+app.MapHub<ProductSaleApp.API.Hubs.ChatHub>("/chatHub");
 
 app.Run();
